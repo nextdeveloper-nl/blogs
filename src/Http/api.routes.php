@@ -1,6 +1,7 @@
 <?php
 
-Route::prefix('blogs')->group(function () {
+Route::prefix('blogs')->group(
+    function () {
     Route::prefix('posts')->group(
         function () {
             Route::get('/', 'Posts\PostsController@index');
@@ -18,7 +19,6 @@ Route::prefix('blogs')->group(function () {
             Route::delete('/{blog_posts}', 'Posts\PostsController@destroy');
         }
     );
+    // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+);
 
-// EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
-
-});
