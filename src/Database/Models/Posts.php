@@ -2,6 +2,7 @@
 
 namespace NextDeveloper\Blogs\Database\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
@@ -12,9 +13,34 @@ use NextDeveloper\Commons\Common\Cache\Traits\CleanCache;
 use NextDeveloper\Commons\Database\Traits\Taggable;
 
 /**
- * Class Posts.
+ * Posts model.
  *
- * @package NextDeveloper\Blogs\Database\Models
+ * @package  NextDeveloper\Blogs\Database\Models
+ * @property integer $id
+ * @property string $uuid
+ * @property string $slug
+ * @property string $title
+ * @property string $body
+ * @property string $header_image
+ * @property string $meta_title
+ * @property string $meta_description
+ * @property string $meta_keywords
+ * @property integer $reply_count
+ * @property integer $read_count
+ * @property integer $bonus_points
+ * @property boolean $is_active
+ * @property boolean $is_locked
+ * @property boolean $is_pinned
+ * @property boolean $is_draft
+ * @property boolean $is_markdown
+ * @property array $tags
+ * @property integer $iam_account_id
+ * @property integer $iam_user_id
+ * @property integer $common_category_id
+ * @property integer $common_domain_id
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon $deleted_at
  */
 class Posts extends Model
 {
@@ -31,6 +57,29 @@ class Posts extends Model
      @var array
      */
     protected $guarded = [];
+
+    protected $fillable = [
+            'slug',
+            'title',
+            'body',
+            'header_image',
+            'meta_title',
+            'meta_description',
+            'meta_keywords',
+            'reply_count',
+            'read_count',
+            'bonus_points',
+            'is_active',
+            'is_locked',
+            'is_pinned',
+            'is_draft',
+            'is_markdown',
+            'tags',
+            'iam_account_id',
+            'iam_user_id',
+            'common_category_id',
+            'common_domain_id',
+    ];
 
     /**
       Here we have the fulltext fields. We can use these for fulltext search if enabled.
@@ -135,6 +184,15 @@ class Posts extends Model
     }
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+
+
+
+
+
+
+
+
 
 
 }
