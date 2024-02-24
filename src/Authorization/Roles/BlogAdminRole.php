@@ -47,7 +47,7 @@ class BlogAdminRole extends AbstractRole implements IAuthorizationRole
 
     public function getModule()
     {
-        return 'blog';
+        return 'blogs';
     }
 
     public function allowedOperations() :array
