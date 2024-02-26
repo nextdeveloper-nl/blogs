@@ -151,7 +151,7 @@ class AbstractPostsService
                 $data['common_domain_id']
             );
         }
-    
+
         if(!array_key_exists('iam_account_id', $data)) {
             $data['iam_account_id'] = UserHelper::currentAccount()->id;
         }
@@ -224,7 +224,7 @@ class AbstractPostsService
                 $data['common_domain_id']
             );
         }
-    
+
         Events::fire('updating:NextDeveloper\Blogs\Posts', $model);
 
         try {
