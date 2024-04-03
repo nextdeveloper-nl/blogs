@@ -15,7 +15,7 @@ class BlogReaderRole extends AbstractRole implements IAuthorizationRole
 {
     public const NAME = 'blog-reader';
 
-    public const LEVEL = 10;
+    public const LEVEL = 150;
 
     public const DESCRIPTION = 'Blog Reader';
 
@@ -50,7 +50,12 @@ class BlogReaderRole extends AbstractRole implements IAuthorizationRole
     public function allowedOperations() :array
     {
         return [
-            'blog_posts:read'
+            'blog_posts:read',
+            'blog_posts:comment',
+            'blog_posts:like',
+            'blog_posts:dislike',
+            'blog_posts:report',
+            'blog_posts:share'
         ];
     }
 
