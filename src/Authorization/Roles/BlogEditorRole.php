@@ -15,7 +15,7 @@ class BlogEditorRole extends AbstractRole implements IAuthorizationRole
 {
     public const NAME = 'blog-editor';
 
-    public const LEVEL = 40;
+    public const LEVEL = 120;
 
     public const DESCRIPTION = 'Blog Editor';
 
