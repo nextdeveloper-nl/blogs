@@ -30,11 +30,9 @@ class BlogReaderRole extends AbstractRole implements IAuthorizationRole
      */
     public function apply(Builder $builder, Model $model)
     {
-        /**
-         * Readers can read any public blog post
-         */
-        $builder->where('is_draft', 'false');
-        $builder->where('is_active', 'true');
+        $builder->where([
+            'is_public' =>  true
+        ]);
     }
 
     public function checkPrivileges(Users $users = null)
@@ -90,5 +88,10 @@ class BlogReaderRole extends AbstractRole implements IAuthorizationRole
     public function getDbPrefix()
     {
         return self::DB_PREFIX;
+    }
+
+    public function checkRules(Users $users): bool
+    {
+        // TODO: Implement checkRules() method.
     }
 }
