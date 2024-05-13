@@ -5,6 +5,7 @@ Route::prefix('blogs')->group(
         Route::prefix('posts')->group(
             function () {
                 Route::get('/', 'Posts\PostsController@index');
+                Route::get('/actions', 'Posts\PostsController@getActions');
 
                 Route::get('{blog_posts}/tags ', 'Posts\PostsController@tags');
                 Route::post('{blog_posts}/tags ', 'Posts\PostsController@saveTags');
@@ -15,6 +16,8 @@ Route::prefix('blogs')->group(
                 Route::get('/{blog_posts}', 'Posts\PostsController@show');
 
                 Route::post('/', 'Posts\PostsController@store');
+                Route::post('/{blog_posts}/do/{action}', 'Posts\PostsController@doAction');
+
                 Route::patch('/{blog_posts}', 'Posts\PostsController@update');
                 Route::delete('/{blog_posts}', 'Posts\PostsController@destroy');
             }
@@ -24,8 +27,10 @@ Route::prefix('blogs')->group(
 
 
 
+
     }
 );
+
 
 
 
