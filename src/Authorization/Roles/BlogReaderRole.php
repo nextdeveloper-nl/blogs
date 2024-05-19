@@ -30,9 +30,12 @@ class BlogReaderRole extends AbstractRole implements IAuthorizationRole
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->where([
-            'is_public' =>  true
-        ]);
+        //  This should change because in the future if we try to implement NON-HTTP request, this will not work.
+        if(request()->getMethod() == 'GET') {
+            $builder->where([
+                'is_public' =>  true
+            ]);
+        }
     }
 
     public function checkPrivileges(Users $users = null)
