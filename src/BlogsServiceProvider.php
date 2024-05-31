@@ -112,7 +112,6 @@ class BlogsServiceProvider extends AbstractServiceProvider {
     protected function registerRoutes() {
         if ( ! $this->app->routesAreCached()) {
             $this->app['router']
-                ->middleware('auth:nd_oauth')
                 ->namespace('NextDeveloper\Blogs\Http\Controllers')
                 ->group(__DIR__.DIRECTORY_SEPARATOR.'Http'.DIRECTORY_SEPARATOR.'api.routes.php');
         }
