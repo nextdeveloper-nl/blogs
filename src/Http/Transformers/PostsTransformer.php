@@ -3,6 +3,7 @@
 namespace NextDeveloper\Blogs\Http\Transformers;
 
 use Illuminate\Support\Facades\Cache;
+use League\Fractal\ParamBag;
 use NextDeveloper\Commons\Common\Cache\CacheHelper;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Commons\Http\Transformers\AbstractTransformer;
@@ -15,6 +16,23 @@ use NextDeveloper\Blogs\Http\Transformers\AbstractTransformers\AbstractPostsTran
  */
 class PostsTransformer extends AbstractPostsTransformer
 {
+    protected array $availableIncludes = [
+        'states',
+        'actions',
+        'media',
+        'comments',
+        'votes',
+        'socialMedia',
+        'phoneNumbers',
+        'addresses',
+        'meta',
+        'user'
+    ];
+
+    protected array $defaultIncludes = [
+        'user'
+    ];
+
 
     /**
      * @param Posts $model
@@ -39,5 +57,11 @@ class PostsTransformer extends AbstractPostsTransformer
         );
 
         return $transformed;
+    }
+
+    public function includeUser(Posts $model) {
+        $user = \NextDeveloper\IAM\Database\Models\Users::where('id', $model->iam_user_id)->first();
+
+        return $this->item($user, new \NextDeveloper\IAM\Http\Transformers\PublicUsersTransformer());
     }
 }
