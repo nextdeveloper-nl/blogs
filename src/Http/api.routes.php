@@ -30,8 +30,10 @@ Route::prefix('blogs')->group(
 
 
 
+
     }
 );
+
 
 
 
