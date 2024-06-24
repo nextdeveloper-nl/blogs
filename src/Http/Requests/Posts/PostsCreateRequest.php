@@ -14,21 +14,22 @@ class PostsCreateRequest extends AbstractFormRequest
     {
         return [
             'slug' => 'nullable|string',
-            'title' => 'required|string',
-            'body' => 'required|string',
-            'header_image' => 'nullable|string',
-            'meta_title' => 'nullable|string',
-            'meta_description' => 'nullable|string',
-            'meta_keywords' => 'nullable|string',
-            'is_active' => 'boolean',
-            'is_locked' => 'boolean',
-            'is_pinned' => 'boolean',
-            'is_draft' => 'boolean',
-            'is_markdown' => 'boolean',
-            'tags' => '',
-            'common_category_id' => 'required|exists:common_categories,uuid|uuid',
-            'common_domain_id' => 'required|exists:common_domains,uuid|uuid',
+        'title' => 'required|string',
+        'body' => 'required|string',
+        'header_image' => 'nullable|string',
+        'meta_title' => 'nullable|string',
+        'meta_description' => 'nullable|string',
+        'meta_keywords' => 'nullable|string',
+        'is_active' => 'boolean',
+        'is_locked' => 'boolean',
+        'is_pinned' => 'boolean',
+        'is_draft' => 'boolean',
+        'is_markdown' => 'boolean',
+        'tags' => '',
+        'common_category_id' => 'required|exists:common_categories,uuid|uuid',
+        'common_domain_id' => 'required|exists:common_domains,uuid|uuid',
         ];
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 }

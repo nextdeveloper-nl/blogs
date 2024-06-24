@@ -112,29 +112,49 @@ class PostsQueryFilter extends AbstractQueryFilter
         return $this->builder->where('bonus_points', $operator, $value);
     }
 
-    public function isActive()
+    public function isActive($value)
     {
-        return $this->builder->where('is_active', true);
+        if(!is_bool($value)) {
+            $value = false;
+        }
+
+        return $this->builder->where('is_active', $value);
     }
 
-    public function isLocked()
+    public function isLocked($value)
     {
-        return $this->builder->where('is_locked', true);
+        if(!is_bool($value)) {
+            $value = false;
+        }
+
+        return $this->builder->where('is_locked', $value);
     }
 
-    public function isPinned()
+    public function isPinned($value)
     {
-        return $this->builder->where('is_pinned', true);
+        if(!is_bool($value)) {
+            $value = false;
+        }
+
+        return $this->builder->where('is_pinned', $value);
     }
 
-    public function isDraft()
+    public function isDraft($value)
     {
-        return $this->builder->where('is_draft', true);
+        if(!is_bool($value)) {
+            $value = false;
+        }
+
+        return $this->builder->where('is_draft', $value);
     }
 
-    public function isMarkdown()
+    public function isMarkdown($value)
     {
-        return $this->builder->where('is_markdown', true);
+        if(!is_bool($value)) {
+            $value = false;
+        }
+
+        return $this->builder->where('is_markdown', $value);
     }
 
     public function createdAtStart($date)
@@ -204,6 +224,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     }
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 
 
 
