@@ -10,10 +10,7 @@ use NextDeveloper\Blogs\Database\Filters\PostsQueryFilter;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Blogs\Services\PostsService;
 use NextDeveloper\Blogs\Http\Requests\Posts\PostsCreateRequest;
-
-use NextDeveloper\Commons\Http\Traits\Tags;
-use NextDeveloper\Commons\Http\Traits\Addresses;
-
+use NextDeveloper\Commons\Http\Traits\Tags;use NextDeveloper\Commons\Http\Traits\Addresses;
 class PostsController extends AbstractController
 {
     private $model = Posts::class;
@@ -35,6 +32,36 @@ class PostsController extends AbstractController
         $data = PostsService::get($filter, $request->all());
 
         return ResponsableFactory::makeResponse($this, $data);
+    }
+
+    /**
+     * This function returns the list of actions that can be performed on this object.
+     *
+     * @return void
+     */
+    public function getActions()
+    {
+        $data = PostsService::getActions();
+
+        return ResponsableFactory::makeResponse($this, $data);
+    }
+
+    /**
+     * Makes the related action to the object
+     *
+     * @param  $objectId
+     * @param  $action
+     * @return array
+     */
+    public function doAction($objectId, $action)
+    {
+        $actionId = PostsService::doAction($objectId, $action, request()->all());
+
+        return $this->withArray(
+            [
+            'action_id' =>  $actionId
+            ]
+        );
     }
 
     /**
@@ -79,6 +106,12 @@ class PostsController extends AbstractController
      */
     public function store(PostsCreateRequest $request)
     {
+        if($request->has('validateOnly') && $request->get('validateOnly') == true) {
+            return [
+                'validation'    =>  'success'
+            ];
+        }
+
         $model = PostsService::create($request->validated());
 
         return ResponsableFactory::makeResponse($this, $model);
@@ -88,12 +121,18 @@ class PostsController extends AbstractController
      * This method updates Posts object on database.
      *
      * @param  $postsId
-     * @param  CountryCreateRequest $request
+     * @param  PostsUpdateRequest $request
      * @return mixed|null
      * @throws \NextDeveloper\Commons\Exceptions\CannotCreateModelException
      */
     public function update($postsId, PostsUpdateRequest $request)
     {
+        if($request->has('validateOnly') && $request->get('validateOnly') == true) {
+            return [
+                'validation'    =>  'success'
+            ];
+        }
+
         $model = PostsService::update($postsId, $request->validated());
 
         return ResponsableFactory::makeResponse($this, $model);
@@ -103,7 +142,6 @@ class PostsController extends AbstractController
      * This method updates Posts object on database.
      *
      * @param  $postsId
-     * @param  CountryCreateRequest $request
      * @return mixed|null
      * @throws \NextDeveloper\Commons\Exceptions\CannotCreateModelException
      */
