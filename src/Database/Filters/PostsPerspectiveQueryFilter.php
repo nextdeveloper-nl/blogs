@@ -4,13 +4,13 @@ namespace NextDeveloper\Blogs\Database\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 use NextDeveloper\Commons\Database\Filters\AbstractQueryFilter;
-                
+            
 
 /**
  * This class automatically puts where clause on database so that use can filter
  * data returned from the query.
  */
-class PostsQueryFilter extends AbstractQueryFilter
+class PostsPerspectiveQueryFilter extends AbstractQueryFilter
 {
     /**
      * Filter by tags
@@ -37,11 +37,6 @@ class PostsQueryFilter extends AbstractQueryFilter
      * @var Builder
      */
     protected $builder;
-    
-    public function slug($value)
-    {
-        return $this->builder->where('slug', 'like', '%' . $value . '%');
-    }
     
     public function title($value)
     {
@@ -71,6 +66,26 @@ class PostsQueryFilter extends AbstractQueryFilter
     public function metaKeywords($value)
     {
         return $this->builder->where('meta_keywords', 'like', '%' . $value . '%');
+    }
+    
+    public function author($value)
+    {
+        return $this->builder->where('author', 'like', '%' . $value . '%');
+    }
+    
+    public function team($value)
+    {
+        return $this->builder->where('team', 'like', '%' . $value . '%');
+    }
+    
+    public function category($value)
+    {
+        return $this->builder->where('category', 'like', '%' . $value . '%');
+    }
+    
+    public function domainName($value)
+    {
+        return $this->builder->where('domain_name', 'like', '%' . $value . '%');
     }
 
     public function replyCount($value)
@@ -157,36 +172,6 @@ class PostsQueryFilter extends AbstractQueryFilter
         return $this->builder->where('is_markdown', $value);
     }
 
-    public function createdAtStart($date)
-    {
-        return $this->builder->where('created_at', '>=', $date);
-    }
-
-    public function createdAtEnd($date)
-    {
-        return $this->builder->where('created_at', '<=', $date);
-    }
-
-    public function updatedAtStart($date)
-    {
-        return $this->builder->where('updated_at', '>=', $date);
-    }
-
-    public function updatedAtEnd($date)
-    {
-        return $this->builder->where('updated_at', '<=', $date);
-    }
-
-    public function deletedAtStart($date)
-    {
-        return $this->builder->where('deleted_at', '>=', $date);
-    }
-
-    public function deletedAtEnd($date)
-    {
-        return $this->builder->where('deleted_at', '<=', $date);
-    }
-
     public function iamAccountId($value)
     {
             $iamAccount = \NextDeveloper\IAM\Database\Models\Accounts::where('uuid', $value)->first();
@@ -214,21 +199,5 @@ class PostsQueryFilter extends AbstractQueryFilter
         }
     }
 
-    public function commonDomainId($value)
-    {
-            $commonDomain = \NextDeveloper\Commons\Database\Models\Domains::where('uuid', $value)->first();
-
-        if($commonDomain) {
-            return $this->builder->where('common_domain_id', '=', $commonDomain->id);
-        }
-    }
-
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
-
-
-
-
-
-
-
 }

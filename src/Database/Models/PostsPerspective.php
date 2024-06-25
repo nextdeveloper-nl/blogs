@@ -2,23 +2,18 @@
 
 namespace NextDeveloper\Blogs\Database\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
 use NextDeveloper\Commons\Database\Traits\Filterable;
-use NextDeveloper\Blogs\Database\Observers\PostsObserver;
+use NextDeveloper\Blogs\Database\Observers\PostsPerspectiveObserver;
 use NextDeveloper\Commons\Database\Traits\UuidId;
 use NextDeveloper\Commons\Common\Cache\Traits\CleanCache;
 use NextDeveloper\Commons\Database\Traits\Taggable;
 
 /**
- * Posts model.
+ * PostsPerspective model.
  *
  * @package  NextDeveloper\Blogs\Database\Models
- * @property integer $id
- * @property string $uuid
- * @property string $slug
  * @property string $title
  * @property string $body
  * @property string $header_image
@@ -36,21 +31,20 @@ use NextDeveloper\Commons\Database\Traits\Taggable;
  * @property array $tags
  * @property integer $iam_account_id
  * @property integer $iam_user_id
+ * @property string $author
+ * @property string $team
  * @property integer $common_category_id
- * @property integer $common_domain_id
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon $deleted_at
+ * @property string $category
+ * @property string $domain_name
  */
-class Posts extends Model
+class PostsPerspective extends Model
 {
     use Filterable, UuidId, CleanCache, Taggable;
-    use SoftDeletes;
 
 
-    public $timestamps = true;
+    public $timestamps = false;
 
-    protected $table = 'blog_posts';
+    protected $table = 'blog_posts_perspective';
 
 
     /**
@@ -59,7 +53,6 @@ class Posts extends Model
     protected $guarded = [];
 
     protected $fillable = [
-            'slug',
             'title',
             'body',
             'header_image',
@@ -77,8 +70,11 @@ class Posts extends Model
             'tags',
             'iam_account_id',
             'iam_user_id',
+            'author',
+            'team',
             'common_category_id',
-            'common_domain_id',
+            'category',
+            'domain_name',
     ];
 
     /**
@@ -101,8 +97,6 @@ class Posts extends Model
      @var array
      */
     protected $casts = [
-    'id' => 'integer',
-    'slug' => 'string',
     'title' => 'string',
     'body' => 'string',
     'header_image' => 'string',
@@ -118,11 +112,11 @@ class Posts extends Model
     'is_draft' => 'boolean',
     'is_markdown' => 'boolean',
     'tags' => \NextDeveloper\Commons\Database\Casts\TextArray::class,
+    'author' => 'string',
+    'team' => 'string',
     'common_category_id' => 'integer',
-    'common_domain_id' => 'integer',
-    'created_at' => 'datetime',
-    'updated_at' => 'datetime',
-    'deleted_at' => 'datetime',
+    'category' => 'string',
+    'domain_name' => 'string',
     ];
 
     /**
@@ -131,9 +125,7 @@ class Posts extends Model
      @var array
      */
     protected $dates = [
-    'created_at',
-    'updated_at',
-    'deleted_at',
+
     ];
 
     /**
@@ -156,7 +148,7 @@ class Posts extends Model
         parent::boot();
 
         //  We create and add Observer even if we wont use it.
-        parent::observe(PostsObserver::class);
+        parent::observe(PostsPerspectiveObserver::class);
 
         self::registerScopes();
     }
@@ -164,7 +156,7 @@ class Posts extends Model
     public static function registerScopes()
     {
         $globalScopes = config('blogs.scopes.global');
-        $modelScopes = config('blogs.scopes.blog_posts');
+        $modelScopes = config('blogs.scopes.blog_posts_perspective');
 
         if(!$modelScopes) { $modelScopes = [];
         }
@@ -184,28 +176,4 @@ class Posts extends Model
     }
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
