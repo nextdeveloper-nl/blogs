@@ -14,6 +14,8 @@ use NextDeveloper\Commons\Database\Traits\Taggable;
  * PostsPerspective model.
  *
  * @package  NextDeveloper\Blogs\Database\Models
+ * @property integer $id
+ * @property string $uuid
  * @property string $title
  * @property string $body
  * @property string $header_image
@@ -97,6 +99,7 @@ class PostsPerspective extends Model
      @var array
      */
     protected $casts = [
+    'id' => 'integer',
     'title' => 'string',
     'body' => 'string',
     'header_image' => 'string',
@@ -176,4 +179,5 @@ class PostsPerspective extends Model
     }
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 }

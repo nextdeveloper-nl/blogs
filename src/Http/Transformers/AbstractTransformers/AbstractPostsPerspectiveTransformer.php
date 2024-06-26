@@ -60,7 +60,7 @@ class AbstractPostsPerspectiveTransformer extends AbstractTransformer
                         
         return $this->buildPayload(
             [
-            'id'  =>  $model->id,
+            'id'  =>  $model->uuid,
             'title'  =>  $model->title,
             'body'  =>  $model->body,
             'header_image'  =>  $model->header_image,
@@ -171,4 +171,5 @@ class AbstractPostsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($addresses, new AddressesTransformer());
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 }
