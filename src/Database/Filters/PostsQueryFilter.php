@@ -4,7 +4,7 @@ namespace NextDeveloper\Blogs\Database\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 use NextDeveloper\Commons\Database\Filters\AbstractQueryFilter;
-                
+
 
 /**
  * This class automatically puts where clause on database so that use can filter
@@ -37,37 +37,37 @@ class PostsQueryFilter extends AbstractQueryFilter
      * @var Builder
      */
     protected $builder;
-    
+
     public function slug($value)
     {
         return $this->builder->where('slug', 'like', '%' . $value . '%');
     }
-    
+
     public function title($value)
     {
         return $this->builder->where('title', 'like', '%' . $value . '%');
     }
-    
+
     public function body($value)
     {
         return $this->builder->where('body', 'like', '%' . $value . '%');
     }
-    
+
     public function headerImage($value)
     {
         return $this->builder->where('header_image', 'like', '%' . $value . '%');
     }
-    
+
     public function metaTitle($value)
     {
         return $this->builder->where('meta_title', 'like', '%' . $value . '%');
     }
-    
+
     public function metaDescription($value)
     {
         return $this->builder->where('meta_description', 'like', '%' . $value . '%');
     }
-    
+
     public function metaKeywords($value)
     {
         return $this->builder->where('meta_keywords', 'like', '%' . $value . '%');
@@ -114,45 +114,35 @@ class PostsQueryFilter extends AbstractQueryFilter
 
     public function isActive($value)
     {
-        if(!is_bool($value)) {
-            $value = false;
-        }
+
 
         return $this->builder->where('is_active', $value);
     }
 
     public function isLocked($value)
     {
-        if(!is_bool($value)) {
-            $value = false;
-        }
+
 
         return $this->builder->where('is_locked', $value);
     }
 
     public function isPinned($value)
     {
-        if(!is_bool($value)) {
-            $value = false;
-        }
+
 
         return $this->builder->where('is_pinned', $value);
     }
 
     public function isDraft($value)
     {
-        if(!is_bool($value)) {
-            $value = false;
-        }
+
 
         return $this->builder->where('is_draft', $value);
     }
 
     public function isMarkdown($value)
     {
-        if(!is_bool($value)) {
-            $value = false;
-        }
+
 
         return $this->builder->where('is_markdown', $value);
     }

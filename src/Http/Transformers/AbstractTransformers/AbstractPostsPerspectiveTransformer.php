@@ -54,35 +54,36 @@ class AbstractPostsPerspectiveTransformer extends AbstractTransformer
      */
     public function transform(PostsPerspective $model)
     {
-                                                $iamAccountId = \NextDeveloper\IAM\Database\Models\Accounts::where('id', $model->iam_account_id)->first();
-                                                            $iamUserId = \NextDeveloper\IAM\Database\Models\Users::where('id', $model->iam_user_id)->first();
-                                                            $commonCategoryId = \NextDeveloper\Commons\Database\Models\Categories::where('id', $model->common_category_id)->first();
-                        
+        $iamAccountId = \NextDeveloper\IAM\Database\Models\Accounts::where('id', $model->iam_account_id)->first();
+        $iamUserId = \NextDeveloper\IAM\Database\Models\Users::where('id', $model->iam_user_id)->first();
+        $commonCategoryId = \NextDeveloper\Commons\Database\Models\Categories::where('id', $model->common_category_id)->first();
+
         return $this->buildPayload(
             [
-            'id'  =>  $model->uuid,
-            'title'  =>  $model->title,
-            'body'  =>  $model->body,
-            'header_image'  =>  $model->header_image,
-            'meta_title'  =>  $model->meta_title,
-            'meta_description'  =>  $model->meta_description,
-            'meta_keywords'  =>  $model->meta_keywords,
-            'reply_count'  =>  $model->reply_count,
-            'read_count'  =>  $model->read_count,
-            'bonus_points'  =>  $model->bonus_points,
-            'is_active'  =>  $model->is_active,
-            'is_locked'  =>  $model->is_locked,
-            'is_pinned'  =>  $model->is_pinned,
-            'is_draft'  =>  $model->is_draft,
-            'is_markdown'  =>  $model->is_markdown,
-            'tags'  =>  $model->tags,
-            'iam_account_id'  =>  $iamAccountId ? $iamAccountId->uuid : null,
-            'iam_user_id'  =>  $iamUserId ? $iamUserId->uuid : null,
-            'author'  =>  $model->author,
-            'team'  =>  $model->team,
-            'common_category_id'  =>  $commonCategoryId ? $commonCategoryId->uuid : null,
-            'category'  =>  $model->category,
-            'domain_name'  =>  $model->domain_name,
+                'id' => $model->uuid,
+                'title' => $model->title,
+                'body' => $model->body,
+                'slug' => $model->slug,
+                'header_image' => $model->header_image,
+                'meta_title' => $model->meta_title,
+                'meta_description' => $model->meta_description,
+                'meta_keywords' => $model->meta_keywords,
+                'reply_count' => $model->reply_count,
+                'read_count' => $model->read_count,
+                'bonus_points' => $model->bonus_points,
+                'is_active' => $model->is_active,
+                'is_locked' => $model->is_locked,
+                'is_pinned' => $model->is_pinned,
+                'is_draft' => $model->is_draft,
+                'is_markdown' => $model->is_markdown,
+                'tags' => $model->tags,
+                'iam_account_id' => $iamAccountId ? $iamAccountId->uuid : null,
+                'iam_user_id' => $iamUserId ? $iamUserId->uuid : null,
+                'author' => $model->author,
+                'team' => $model->team,
+                'common_category_id' => $commonCategoryId ? $commonCategoryId->uuid : null,
+                'category' => $model->category,
+                'domain_name' => $model->domain_name,
             ]
         );
     }
