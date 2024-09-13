@@ -48,6 +48,11 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
         return $this->builder->where('body', 'like', '%' . $value . '%');
     }
 
+    public function slug($value)
+    {
+        return $this->builder->where('slug', $value);
+    }
+
     public function headerImage($value)
     {
         return $this->builder->where('header_image', 'like', '%' . $value . '%');
