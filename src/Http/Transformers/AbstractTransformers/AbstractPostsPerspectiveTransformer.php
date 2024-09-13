@@ -84,6 +84,9 @@ class AbstractPostsPerspectiveTransformer extends AbstractTransformer
                 'common_category_id' => $commonCategoryId ? $commonCategoryId->uuid : null,
                 'category' => $model->category,
                 'domain_name' => $model->domain_name,
+                'created_at'  =>  $model->created_at,
+                'updated_at'  =>  $model->updated_at,
+                'deleted_at'  =>  $model->deleted_at
             ]
         );
     }
