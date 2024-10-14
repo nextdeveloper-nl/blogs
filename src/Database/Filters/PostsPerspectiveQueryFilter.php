@@ -194,6 +194,15 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
         }
     }
 
+    public function commonDomainId($value)
+    {
+        $commonDomain = \NextDeveloper\Commons\Database\Models\Domains::where('uuid', $value)->first();
+
+        if($commonDomain) {
+            return $this->builder->where('common_domain_id', '=', $commonDomain->id);
+        }
+    }
+
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
 }
