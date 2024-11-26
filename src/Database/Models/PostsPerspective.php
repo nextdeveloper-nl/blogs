@@ -9,6 +9,8 @@ use NextDeveloper\Blogs\Database\Observers\PostsPerspectiveObserver;
 use NextDeveloper\Commons\Database\Traits\UuidId;
 use NextDeveloper\Commons\Common\Cache\Traits\CleanCache;
 use NextDeveloper\Commons\Database\Traits\Taggable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use NextDeveloper\Commons\Database\Traits\HasStates;
 
 /**
  * PostsPerspective model.
@@ -16,6 +18,7 @@ use NextDeveloper\Commons\Database\Traits\Taggable;
  * @package  NextDeveloper\Blogs\Database\Models
  * @property integer $id
  * @property string $uuid
+ * @property string $slug
  * @property string $title
  * @property string $body
  * @property string $header_image
@@ -33,121 +36,131 @@ use NextDeveloper\Commons\Database\Traits\Taggable;
  * @property array $tags
  * @property integer $iam_account_id
  * @property integer $iam_user_id
+ * @property integer $common_domain_id
  * @property string $author
  * @property string $team
  * @property integer $common_category_id
  * @property string $category
  * @property string $domain_name
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon $deleted_at
  */
 class PostsPerspective extends Model
 {
-    use Filterable, UuidId, CleanCache, Taggable;
+    use Filterable, UuidId, CleanCache, Taggable, HasStates;
+    use SoftDeletes;
 
-
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $table = 'blog_posts_perspective';
 
 
     /**
-     * @var array
+     @var array
      */
     protected $guarded = [];
 
     protected $fillable = [
-        'title',
-        'body',
-        'header_image',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
-        'reply_count',
-        'read_count',
-        'bonus_points',
-        'is_active',
-        'is_locked',
-        'is_pinned',
-        'is_draft',
-        'is_markdown',
-        'tags',
-        'iam_account_id',
-        'iam_user_id',
-        'author',
-        'team',
-        'common_category_id',
-        'category',
-        'domain_name',
+            'slug',
+            'title',
+            'body',
+            'header_image',
+            'meta_title',
+            'meta_description',
+            'meta_keywords',
+            'reply_count',
+            'read_count',
+            'bonus_points',
+            'is_active',
+            'is_locked',
+            'is_pinned',
+            'is_draft',
+            'is_markdown',
+            'tags',
+            'iam_account_id',
+            'iam_user_id',
+            'common_domain_id',
+            'author',
+            'team',
+            'common_category_id',
+            'category',
+            'domain_name',
     ];
 
     /**
-     * Here we have the fulltext fields. We can use these for fulltext search if enabled.
+      Here we have the fulltext fields. We can use these for fulltext search if enabled.
      */
     protected $fullTextFields = [
 
     ];
 
     /**
-     * @var array
+     @var array
      */
     protected $appends = [
 
     ];
 
     /**
-     * We are casting fields to objects so that we can work on them better
+     We are casting fields to objects so that we can work on them better
      *
-     * @var array
+     @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'title' => 'string',
-        'body' => 'string',
-        'header_image' => 'string',
-        'meta_title' => 'string',
-        'meta_description' => 'string',
-        'meta_keywords' => 'string',
-        'reply_count' => 'integer',
-        'read_count' => 'integer',
-        'bonus_points' => 'integer',
-        'is_active' => 'boolean',
-        'is_locked' => 'boolean',
-        'is_pinned' => 'boolean',
-        'is_draft' => 'boolean',
-        'is_markdown' => 'boolean',
-        'tags' => \NextDeveloper\Commons\Database\Casts\TextArray::class,
-        'author' => 'string',
-        'team' => 'string',
-        'common_category_id' => 'integer',
-        'category' => 'string',
-        'domain_name' => 'string',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+    'id' => 'integer',
+    'slug' => 'string',
+    'title' => 'string',
+    'body' => 'string',
+    'header_image' => 'string',
+    'meta_title' => 'string',
+    'meta_description' => 'string',
+    'meta_keywords' => 'string',
+    'reply_count' => 'integer',
+    'read_count' => 'integer',
+    'bonus_points' => 'integer',
+    'is_active' => 'boolean',
+    'is_locked' => 'boolean',
+    'is_pinned' => 'boolean',
+    'is_draft' => 'boolean',
+    'is_markdown' => 'boolean',
+    'tags' => \NextDeveloper\Commons\Database\Casts\TextArray::class,
+    'common_domain_id' => 'integer',
+    'author' => 'string',
+    'team' => 'string',
+    'common_category_id' => 'integer',
+    'category' => 'string',
+    'domain_name' => 'string',
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
+    'deleted_at' => 'datetime',
     ];
 
     /**
-     * We are casting data fields.
+     We are casting data fields.
      *
-     * @var array
+     @var array
      */
     protected $dates = [
-
+    'created_at',
+    'updated_at',
+    'deleted_at',
     ];
 
     /**
-     * @var array
+     @var array
      */
     protected $with = [
 
     ];
 
     /**
-     * @var int
+     @var int
      */
     protected $perPage = 20;
 
     /**
-     * @return void
+     @return void
      */
     public static function boot()
     {
@@ -164,11 +177,9 @@ class PostsPerspective extends Model
         $globalScopes = config('blogs.scopes.global');
         $modelScopes = config('blogs.scopes.blog_posts_perspective');
 
-        if (!$modelScopes) {
-            $modelScopes = [];
+        if(!$modelScopes) { $modelScopes = [];
         }
-        if (!$globalScopes) {
-            $globalScopes = [];
+        if (!$globalScopes) { $globalScopes = [];
         }
 
         $scopes = array_merge(
@@ -176,7 +187,7 @@ class PostsPerspective extends Model
             $modelScopes
         );
 
-        if ($scopes) {
+        if($scopes) {
             foreach ($scopes as $scope) {
                 static::addGlobalScope(app($scope));
             }
@@ -184,5 +195,6 @@ class PostsPerspective extends Model
     }
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 
 }
