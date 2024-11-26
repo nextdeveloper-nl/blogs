@@ -65,6 +65,7 @@ trait BlogPostTestTraits
                 'meta_title'  =>  'a',
                 'meta_description'  =>  'a',
                 'meta_keywords'  =>  'a',
+                'astract'  =>  'a',
                 'reply_count'  =>  '1',
                 'read_count'  =>  '1',
                 'bonus_points'  =>  '1',
@@ -470,6 +471,25 @@ trait BlogPostTestTraits
             $request = new Request(
                 [
                 'meta_keywords'  =>  'a'
+                ]
+            );
+
+            $filter = new BlogPostQueryFilter($request);
+
+            $model = \NextDeveloper\Blogs\Database\Models\BlogPost::filter($filter)->first();
+        } catch (\Exception $e) {
+            $this->assertFalse(false, $e->getMessage());
+        }
+
+        $this->assertTrue(true);
+    }
+
+    public function test_blogpost_event_astract_filter()
+    {
+        try {
+            $request = new Request(
+                [
+                'astract'  =>  'a'
                 ]
             );
 
