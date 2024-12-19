@@ -28,7 +28,7 @@ class PostsPerspectiveTransformer extends AbstractPostsPerspectiveTransformer
         );
 
         if($transformed) {
-            return $transformed;
+//            return $transformed;
         }
 
         $transformed = parent::transform($model);
