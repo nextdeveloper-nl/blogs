@@ -46,7 +46,7 @@ class PostsTransformer extends AbstractPostsTransformer
         );
 
         if($transformed) {
-            return $transformed;
+//            return $transformed;
         }
 
         $transformed = parent::transform($model);
