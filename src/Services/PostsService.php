@@ -36,4 +36,14 @@ class PostsService extends AbstractPostsService
 
         return $list;
     }
+
+    public static function create($data)
+    {
+        if(is_array($data['tags'])) {
+            foreach ($data['tags'] as &$tag)
+                $tag = Str::replace(',', '', $tag);
+        }
+
+        return parent::create($data);
+    }
 }
