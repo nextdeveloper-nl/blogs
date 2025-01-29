@@ -168,7 +168,7 @@ class Posts extends Model
         parent::boot();
 
         //  We create and add Observer even if we wont use it.
-        //parent::observe(PostsObserver::class);
+        parent::observe(PostsObserver::class);
 
         self::registerScopes();
     }
