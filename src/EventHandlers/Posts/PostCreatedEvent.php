@@ -3,7 +3,11 @@
 namespace NextDeveloper\Blogs\EventHandlers\Posts;
 
 use Exception;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use NextDeveloper\Blogs\Database\Models\Posts;
@@ -15,7 +19,7 @@ use NextDeveloper\Blogs\Helpers\TranslatablePostHelper;
 
 class PostCreatedEvent implements ShouldQueue
 {
-    use TranslatablePostHelper;
+    use TranslatablePostHelper, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
         private readonly Posts $model
