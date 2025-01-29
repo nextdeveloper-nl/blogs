@@ -29,6 +29,9 @@ class PostsCreateRequest extends AbstractFormRequest
         'common_category_id' => 'required|exists:common_categories,uuid|uuid',
         'common_domain_id' => 'required|exists:common_domains,uuid|uuid',
         'astract' => 'nullable|string',
+        'alternates' => '',
+        'alternate_of' => 'nullable|integer',
+        'locale' => '',
         ];
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
