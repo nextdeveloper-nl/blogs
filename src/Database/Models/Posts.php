@@ -45,7 +45,7 @@ use NextDeveloper\Commons\Database\Traits\Taggable;
  * @property string $astract
  * @property $alternates
  * @property integer $alternate_of
- * @property $locale
+ * @property string $locale
  */
 class Posts extends Model
 {
@@ -132,9 +132,9 @@ class Posts extends Model
     'updated_at' => 'datetime',
     'deleted_at' => 'datetime',
     'astract' => 'string',
+    'alternates' => 'array',
     'alternate_of' => 'integer',
     'locale' => 'string',
-    'alternates' => 'array',
     ];
 
     /**

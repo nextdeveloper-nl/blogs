@@ -77,6 +77,11 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->builder->where('astract', 'like', '%' . $value . '%');
     }
+    
+    public function locale($value)
+    {
+        return $this->builder->where('locale', 'like', '%' . $value . '%');
+    }
 
     public function replyCount($value)
     {

@@ -31,7 +31,7 @@ class PostsUpdateRequest extends AbstractFormRequest
         'astract' => 'nullable|string',
         'alternates' => '',
         'alternate_of' => 'nullable|integer',
-        'locale' => '',
+        'locale' => 'string',
         ];
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE

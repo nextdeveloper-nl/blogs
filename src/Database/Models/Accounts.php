@@ -68,8 +68,8 @@ class Accounts extends Model
     protected $casts = [
     'id' => 'integer',
     'common_domain_id' => 'integer',
-    'is_auto_translate_enabled' => 'boolean',
     'alternate' => 'array',
+    'is_auto_translate_enabled' => 'boolean',
     'created_at' => 'datetime',
     'updated_at' => 'datetime',
     'deleted_at' => 'datetime',
