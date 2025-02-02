@@ -2,6 +2,27 @@
 
 Route::prefix('blogs')->group(
     function () {
+        Route::prefix('accounts')->group(
+            function () {
+                Route::get('/', 'Accounts\AccountsController@index');
+                Route::get('/actions', 'Accounts\AccountsController@getActions');
+
+                Route::get('{blog_accounts}/tags ', 'Accounts\AccountsController@tags');
+                Route::post('{blog_accounts}/tags ', 'Accounts\AccountsController@saveTags');
+                Route::get('{blog_accounts}/addresses ', 'Accounts\AccountsController@addresses');
+                Route::post('{blog_accounts}/addresses ', 'Accounts\AccountsController@saveAddresses');
+
+                Route::get('/{blog_accounts}/{subObjects}', 'Accounts\AccountsController@relatedObjects');
+                Route::get('/{blog_accounts}', 'Accounts\AccountsController@show');
+
+                Route::post('/', 'Accounts\AccountsController@store');
+                Route::post('/{blog_accounts}/do/{action}', 'Accounts\AccountsController@doAction');
+
+                Route::patch('/{blog_accounts}', 'Accounts\AccountsController@update');
+                Route::delete('/{blog_accounts}', 'Accounts\AccountsController@destroy');
+            }
+        );
+
         Route::prefix('posts')->group(
             function () {
                 Route::get('/', 'Posts\PostsController@index');

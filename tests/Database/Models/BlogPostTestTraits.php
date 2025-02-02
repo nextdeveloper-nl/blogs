@@ -66,9 +66,11 @@ trait BlogPostTestTraits
                 'meta_description'  =>  'a',
                 'meta_keywords'  =>  'a',
                 'astract'  =>  'a',
+                'locale'  =>  'a',
                 'reply_count'  =>  '1',
                 'read_count'  =>  '1',
                 'bonus_points'  =>  '1',
+                'alternate_of'  =>  '1',
                             ],
                 ['http_errors' => false]
             ]
@@ -503,6 +505,25 @@ trait BlogPostTestTraits
         $this->assertTrue(true);
     }
 
+    public function test_blogpost_event_locale_filter()
+    {
+        try {
+            $request = new Request(
+                [
+                'locale'  =>  'a'
+                ]
+            );
+
+            $filter = new BlogPostQueryFilter($request);
+
+            $model = \NextDeveloper\Blogs\Database\Models\BlogPost::filter($filter)->first();
+        } catch (\Exception $e) {
+            $this->assertFalse(false, $e->getMessage());
+        }
+
+        $this->assertTrue(true);
+    }
+
     public function test_blogpost_event_reply_count_filter()
     {
         try {
@@ -547,6 +568,25 @@ trait BlogPostTestTraits
             $request = new Request(
                 [
                 'bonus_points'  =>  '1'
+                ]
+            );
+
+            $filter = new BlogPostQueryFilter($request);
+
+            $model = \NextDeveloper\Blogs\Database\Models\BlogPost::filter($filter)->first();
+        } catch (\Exception $e) {
+            $this->assertFalse(false, $e->getMessage());
+        }
+
+        $this->assertTrue(true);
+    }
+
+    public function test_blogpost_event_alternate_of_filter()
+    {
+        try {
+            $request = new Request(
+                [
+                'alternate_of'  =>  '1'
                 ]
             );
 

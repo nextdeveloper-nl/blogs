@@ -57,7 +57,7 @@ class PostsPerspective extends Model
 
 
     /**
-     @var array
+     * @var array
      */
     protected $guarded = [];
 
