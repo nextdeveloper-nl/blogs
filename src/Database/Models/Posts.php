@@ -42,7 +42,7 @@ use NextDeveloper\Commons\Database\Traits\Taggable;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $deleted_at
- * @property string $astract
+ * @property string $abstract
  * @property $alternates
  * @property integer $alternate_of
  * @property string $locale
@@ -83,7 +83,7 @@ class Posts extends Model
             'iam_user_id',
             'common_category_id',
             'common_domain_id',
-            'astract',
+            'abstract',
             'alternates',
             'alternate_of',
             'locale',
@@ -131,7 +131,7 @@ class Posts extends Model
     'created_at' => 'datetime',
     'updated_at' => 'datetime',
     'deleted_at' => 'datetime',
-    'astract' => 'string',
+    'abstract' => 'string',
     'alternates' => 'array',
     'alternate_of' => 'integer',
     'locale' => 'string',
@@ -199,22 +199,22 @@ class Posts extends Model
     {
         return $this->belongsTo(\NextDeveloper\IAM\Database\Models\Users::class);
     }
-    
+
     public function accounts() : \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\NextDeveloper\IAM\Database\Models\Accounts::class);
     }
-    
+
     public function categories() : \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\NextDeveloper\Commons\Database\Models\Categories::class);
     }
-    
+
     public function domains() : \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\NextDeveloper\Commons\Database\Models\Domains::class);
     }
-    
+
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
 
