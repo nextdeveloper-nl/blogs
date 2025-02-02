@@ -43,10 +43,13 @@ use NextDeveloper\Commons\Database\Traits\Taggable;
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $deleted_at
  * @property string $astract
+ * @property $alternates
+ * @property integer $alternate_of
+ * @property string $locale
  */
 class Posts extends Model
 {
-    use Filterable, UuidId, CleanCache, Taggable, HasStates;
+    use Filterable, UuidId, CleanCache, Taggable;
     use SoftDeletes;
 
     public $timestamps = true;
@@ -81,6 +84,9 @@ class Posts extends Model
             'common_category_id',
             'common_domain_id',
             'astract',
+            'alternates',
+            'alternate_of',
+            'locale',
     ];
 
     /**
@@ -126,6 +132,9 @@ class Posts extends Model
     'updated_at' => 'datetime',
     'deleted_at' => 'datetime',
     'astract' => 'string',
+    'alternates' => 'array',
+    'alternate_of' => 'integer',
+    'locale' => 'string',
     ];
 
     /**
