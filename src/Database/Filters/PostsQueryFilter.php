@@ -4,7 +4,7 @@ namespace NextDeveloper\Blogs\Database\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 use NextDeveloper\Commons\Database\Filters\AbstractQueryFilter;
-                
+
 
 /**
  * This class automatically puts where clause on database so that use can filter
@@ -37,47 +37,47 @@ class PostsQueryFilter extends AbstractQueryFilter
      * @var Builder
      */
     protected $builder;
-    
+
     public function slug($value)
     {
         return $this->builder->where('slug', 'like', '%' . $value . '%');
     }
-    
+
     public function title($value)
     {
         return $this->builder->where('title', 'like', '%' . $value . '%');
     }
-    
+
     public function body($value)
     {
         return $this->builder->where('body', 'like', '%' . $value . '%');
     }
-    
+
     public function headerImage($value)
     {
         return $this->builder->where('header_image', 'like', '%' . $value . '%');
     }
-    
+
     public function metaTitle($value)
     {
         return $this->builder->where('meta_title', 'like', '%' . $value . '%');
     }
-    
+
     public function metaDescription($value)
     {
         return $this->builder->where('meta_description', 'like', '%' . $value . '%');
     }
-    
+
     public function metaKeywords($value)
     {
         return $this->builder->where('meta_keywords', 'like', '%' . $value . '%');
     }
-    
-    public function astract($value)
+
+    public function abstract($value)
     {
-        return $this->builder->where('astract', 'like', '%' . $value . '%');
+        return $this->builder->where('abstract', 'like', '%' . $value . '%');
     }
-    
+
     public function locale($value)
     {
         return $this->builder->where('locale', 'like', '%' . $value . '%');

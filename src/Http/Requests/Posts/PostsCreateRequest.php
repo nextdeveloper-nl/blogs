@@ -28,7 +28,7 @@ class PostsCreateRequest extends AbstractFormRequest
         'tags' => '',
         'common_category_id' => 'required|exists:common_categories,uuid|uuid',
         'common_domain_id' => 'required|exists:common_domains,uuid|uuid',
-        'astract' => 'nullable|string',
+        'abstract' => 'nullable|string',
         'alternates' => '',
         'alternate_of' => 'nullable|integer',
         'locale' => '',
