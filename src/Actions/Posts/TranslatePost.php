@@ -4,6 +4,7 @@ namespace NextDeveloper\Blogs\Actions\Posts;
 
 use App\Models\User;
 use Exception;
+use NextDeveloper\Blogs\Services\AccountsService;
 use NextDeveloper\Commons\Actions\AbstractAction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -52,6 +53,8 @@ class TranslatePost extends AbstractAction
      */
     public function handle(): void
     {
+        $this->setProgress(0, 'Initiating post translation ...');
+
         DB::beginTransaction();
 
         try {
@@ -63,7 +66,7 @@ class TranslatePost extends AbstractAction
             }
 
             // Retrieve the blog account associated with the post's domain
-            $blogAccount = $this->getBlogAccount();
+            $blogAccount = AccountsService::getBlogAccount($this->model);
             // 10% progress
             $this->setProgress(10, 'Retrieving blog account ...');
 
@@ -108,21 +111,6 @@ class TranslatePost extends AbstractAction
     private function shouldSkipProcessing(): bool
     {
         return $this->model->is_draft || $this->model->alternate_of;
-    }
-
-    /**
-     * Retrieves the blog account associated with the post's domain.
-     *
-     * @return Accounts|null
-     */
-    private function getBlogAccount(): ?Accounts
-    {
-        $query = Accounts::withoutGlobalScopes();
-
-        return $query
-            ->where('common_domain_id', $this->model->common_domain_id)
-            ->where('is_auto_translate_enabled', true)
-            ->first();
     }
 
     /**
