@@ -180,7 +180,13 @@ class AbstractAccountsService
                 $data['common_domain_id']
             );
         }
-
+        if (array_key_exists('common_language_id', $data)) {
+            $data['common_language_id'] = DatabaseHelper::uuidToId(
+                '\NextDeveloper\Commons\Database\Models\Languages',
+                $data['common_language_id']
+            );
+        }
+                        
         try {
             $model = Accounts::create($data);
         } catch(\Exception $e) {
@@ -234,7 +240,13 @@ class AbstractAccountsService
                 $data['common_domain_id']
             );
         }
-
+        if (array_key_exists('common_language_id', $data)) {
+            $data['common_language_id'] = DatabaseHelper::uuidToId(
+                '\NextDeveloper\Commons\Database\Models\Languages',
+                $data['common_language_id']
+            );
+        }
+    
         Events::fire('updating:NextDeveloper\Blogs\Accounts', $model);
 
         try {

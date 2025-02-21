@@ -50,6 +50,7 @@ class TranslatePost extends AbstractAction
      * Main handler function to process post creation and initiate translations.
      *
      * @throws Exception
+     * @throws \Throwable
      */
     public function handle(): void
     {
@@ -156,27 +157,6 @@ class TranslatePost extends AbstractAction
         // Decode the alternate configuration if it's a JSON string
         $alternateConfig = is_string($alternateConfig) ? json_decode($alternateConfig, true) : $alternateConfig;
 
-        // Check if there are domain IDs specified in the configuration
-        if (!empty($alternateConfig['common_domain_ids'])) {
-
-            // Query the Domains model without global scopes
-            $query = Domains::withoutGlobalScopes();
-
-            // Retrieve domains matching the specified IDs and extract the locale from the domain name
-            return $query
-                ->whereIn('id', $alternateConfig['common_domain_ids'])
-                ->get()
-                ->map(function($domain) {
-                    // Extract the last part of the domain name as the locale
-                    $parts = explode('.', $domain->name);
-                    return strtolower(end($parts));
-                })
-                ->filter() // Remove any empty values
-                ->unique() // Ensure each locale is unique
-                ->values() // Reset the array keys
-                ->toArray(); // Convert the collection to an array
-        }
-
         // Check if there are language IDs specified in the configuration
         if (!empty($alternateConfig['common_language_ids'])) {
 
@@ -202,7 +182,7 @@ class TranslatePost extends AbstractAction
     }
 
     /**
-     * @throws Exception
+     * @throws Exception|\Throwable
      */
     private function createTranslation(string $target): void
     {

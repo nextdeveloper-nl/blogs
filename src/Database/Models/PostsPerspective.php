@@ -37,6 +37,9 @@ use NextDeveloper\Commons\Database\Traits\HasStates;
  * @property integer $iam_account_id
  * @property integer $iam_user_id
  * @property integer $common_domain_id
+ * @property string $locale
+ * @property $alternates
+ * @property integer $alternate_of
  * @property string $author
  * @property string $team
  * @property integer $common_category_id
@@ -48,7 +51,7 @@ use NextDeveloper\Commons\Database\Traits\HasStates;
  */
 class PostsPerspective extends Model
 {
-    use Filterable, UuidId, CleanCache, Taggable, HasStates;
+    use Filterable, UuidId, CleanCache, Taggable;
     use SoftDeletes;
 
     public $timestamps = true;
@@ -81,6 +84,9 @@ class PostsPerspective extends Model
             'iam_account_id',
             'iam_user_id',
             'common_domain_id',
+            'locale',
+            'alternates',
+            'alternate_of',
             'author',
             'team',
             'common_category_id',
@@ -126,6 +132,9 @@ class PostsPerspective extends Model
     'is_markdown' => 'boolean',
     'tags' => \NextDeveloper\Commons\Database\Casts\TextArray::class,
     'common_domain_id' => 'integer',
+    'locale' => 'string',
+    'alternates' => 'array',
+    'alternate_of' => 'integer',
     'author' => 'string',
     'team' => 'string',
     'common_category_id' => 'integer',

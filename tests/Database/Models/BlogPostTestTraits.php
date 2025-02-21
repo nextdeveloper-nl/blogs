@@ -65,7 +65,7 @@ trait BlogPostTestTraits
                 'meta_title'  =>  'a',
                 'meta_description'  =>  'a',
                 'meta_keywords'  =>  'a',
-                'abstract'  =>  'a',
+                'astract'  =>  'a',
                 'locale'  =>  'a',
                 'reply_count'  =>  '1',
                 'read_count'  =>  '1',
@@ -486,12 +486,12 @@ trait BlogPostTestTraits
         $this->assertTrue(true);
     }
 
-    public function test_blogpost_event_abstract_filter()
+    public function test_blogpost_event_astract_filter()
     {
         try {
             $request = new Request(
                 [
-                'abstract'  =>  'a'
+                'astract'  =>  'a'
                 ]
             );
 
@@ -774,4 +774,5 @@ trait BlogPostTestTraits
         $this->assertTrue(true);
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 }

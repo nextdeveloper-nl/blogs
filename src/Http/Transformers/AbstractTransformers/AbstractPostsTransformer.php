@@ -89,6 +89,7 @@ class AbstractPostsTransformer extends AbstractTransformer
             'alternates'  =>  $model->alternates,
             'alternate_of'  =>  $model->alternate_of,
             'locale'  =>  $model->locale,
+            'blog_account_id'  =>  $blogAccountId ? $blogAccountId->uuid : null,
             ]
         );
     }

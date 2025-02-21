@@ -55,6 +55,7 @@ class AbstractAccountsTransformer extends AbstractTransformer
     public function transform(Accounts $model)
     {
                                                 $commonDomainId = \NextDeveloper\Commons\Database\Models\Domains::where('id', $model->common_domain_id)->first();
+                                                            $commonLanguageId = \NextDeveloper\Commons\Database\Models\Languages::where('id', $model->common_language_id)->first();
                         
         return $this->buildPayload(
             [
@@ -65,6 +66,9 @@ class AbstractAccountsTransformer extends AbstractTransformer
             'created_at'  =>  $model->created_at,
             'updated_at'  =>  $model->updated_at,
             'deleted_at'  =>  $model->deleted_at,
+            'limits'  =>  $model->limits,
+            'is_suspended'  =>  $model->is_suspended,
+            'common_language_id'  =>  $commonLanguageId ? $commonLanguageId->uuid : null,
             ]
         );
     }

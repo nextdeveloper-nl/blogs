@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Blogs\Helpers\TranslatablePostHelper;
 use NextDeveloper\Commons\Actions\AbstractAction;
+use NextDeveloper\Commons\Exceptions\NotAllowedException;
 use NextDeveloper\Commons\Helpers\SlugHelper;
 use NextDeveloper\IAM\Helpers\UserHelper;
 
@@ -27,6 +28,10 @@ class UpdatePostTranslations extends AbstractAction
     ];
 
     // Constructor to initialize the Posts model
+
+    /**
+     * @throws NotAllowedException
+     */
     public function __construct(Posts $model)
     {
         UserHelper::setUserById($model->iam_user_id);
@@ -40,7 +45,7 @@ class UpdatePostTranslations extends AbstractAction
     /**
      * Main handler function to process post updates.
      *
-     * @throws Exception
+     * @throws Exception|\Throwable
      */
     public function handle(): void
     {
@@ -128,6 +133,7 @@ class UpdatePostTranslations extends AbstractAction
      * Processes translations for each valid alternate.
      *
      * @param array $alternates
+     * @throws \Throwable
      */
     private function processTranslations(array $alternates): void
     {
@@ -179,6 +185,9 @@ class UpdatePostTranslations extends AbstractAction
             : ($alternates ?? []);
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function updateTranslation(array $alternate): void
     {
         try {

@@ -37,47 +37,47 @@ class PostsQueryFilter extends AbstractQueryFilter
      * @var Builder
      */
     protected $builder;
-
+    
     public function slug($value)
     {
         return $this->builder->where('slug', 'like', '%' . $value . '%');
     }
-
+    
     public function title($value)
     {
         return $this->builder->where('title', 'like', '%' . $value . '%');
     }
-
+    
     public function body($value)
     {
         return $this->builder->where('body', 'like', '%' . $value . '%');
     }
-
+    
     public function headerImage($value)
     {
         return $this->builder->where('header_image', 'like', '%' . $value . '%');
     }
-
+    
     public function metaTitle($value)
     {
         return $this->builder->where('meta_title', 'like', '%' . $value . '%');
     }
-
+    
     public function metaDescription($value)
     {
         return $this->builder->where('meta_description', 'like', '%' . $value . '%');
     }
-
+    
     public function metaKeywords($value)
     {
         return $this->builder->where('meta_keywords', 'like', '%' . $value . '%');
     }
-
-    public function abstract($value)
+    
+    public function astract($value)
     {
-        return $this->builder->where('abstract', 'like', '%' . $value . '%');
+        return $this->builder->where('astract', 'like', '%' . $value . '%');
     }
-
+    
     public function locale($value)
     {
         return $this->builder->where('locale', 'like', '%' . $value . '%');
@@ -243,6 +243,15 @@ class PostsQueryFilter extends AbstractQueryFilter
 
         if($commonDomain) {
             return $this->builder->where('common_domain_id', '=', $commonDomain->id);
+        }
+    }
+
+    public function blogAccountId($value)
+    {
+            $blogAccount = \NextDeveloper\Blogs\Database\Models\Accounts::where('uuid', $value)->first();
+
+        if($blogAccount) {
+            return $this->builder->where('blog_account_id', '=', $blogAccount->id);
         }
     }
 
