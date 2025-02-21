@@ -27,6 +27,15 @@ class AccountsQueryFilter extends AbstractQueryFilter
         return $this->builder->where('is_auto_translate_enabled', $value);
     }
 
+    public function isSuspended($value)
+    {
+        if(!is_bool($value)) {
+            $value = false;
+        }
+
+        return $this->builder->where('is_suspended', $value);
+    }
+
     public function createdAtStart($date)
     {
         return $this->builder->where('created_at', '>=', $date);
@@ -63,6 +72,15 @@ class AccountsQueryFilter extends AbstractQueryFilter
 
         if($commonDomain) {
             return $this->builder->where('common_domain_id', '=', $commonDomain->id);
+        }
+    }
+
+    public function commonLanguageId($value)
+    {
+            $commonLanguage = \NextDeveloper\Commons\Database\Models\Languages::where('uuid', $value)->first();
+
+        if($commonLanguage) {
+            return $this->builder->where('common_language_id', '=', $commonLanguage->id);
         }
     }
 

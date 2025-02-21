@@ -93,31 +93,27 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
     {
         return $this->builder->where('meta_keywords', 'like', '%' . $value . '%');
     }
-
-        //  This is an alias function of metaKeywords
-    public function meta_keywords($value)
+    
+    public function locale($value)
     {
-        return $this->metaKeywords($value);
+        return $this->builder->where('locale', 'like', '%' . $value . '%');
     }
-        
+    
     public function author($value)
     {
         return $this->builder->where('author', 'like', '%' . $value . '%');
     }
-
-        
+    
     public function team($value)
     {
         return $this->builder->where('team', 'like', '%' . $value . '%');
     }
-
-        
+    
     public function category($value)
     {
         return $this->builder->where('category', 'like', '%' . $value . '%');
     }
-
-        
+    
     public function domainName($value)
     {
         return $this->builder->where('domain_name', 'like', '%' . $value . '%');
@@ -180,14 +176,25 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
         return $this->builder->where('bonus_points', $operator, $value);
     }
 
-        //  This is an alias function of bonusPoints
-    public function bonus_points($value)
+    public function alternateOf($value)
     {
-        return $this->bonusPoints($value);
+        $operator = substr($value, 0, 1);
+
+        if ($operator != '<' || $operator != '>') {
+            $operator = '=';
+        } else {
+            $value = substr($value, 1);
+        }
+
+        return $this->builder->where('alternate_of', $operator, $value);
     }
-    
+
     public function isActive($value)
     {
+        if(!is_bool($value)) {
+            $value = false;
+        }
+
         return $this->builder->where('is_active', $value);
     }
 
@@ -199,6 +206,10 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
      
     public function isLocked($value)
     {
+        if(!is_bool($value)) {
+            $value = false;
+        }
+
         return $this->builder->where('is_locked', $value);
     }
 
@@ -210,6 +221,10 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
      
     public function isPinned($value)
     {
+        if(!is_bool($value)) {
+            $value = false;
+        }
+
         return $this->builder->where('is_pinned', $value);
     }
 
@@ -221,6 +236,10 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
      
     public function isDraft($value)
     {
+        if(!is_bool($value)) {
+            $value = false;
+        }
+
         return $this->builder->where('is_draft', $value);
     }
 
@@ -316,7 +335,6 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
         }
     }
 
-    
     public function iamUserId($value)
     {
             $iamUser = \NextDeveloper\IAM\Database\Models\Users::where('uuid', $value)->first();
@@ -326,7 +344,6 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
         }
     }
 
-    
     public function commonDomainId($value)
     {
             $commonDomain = \NextDeveloper\Commons\Database\Models\Domains::where('uuid', $value)->first();

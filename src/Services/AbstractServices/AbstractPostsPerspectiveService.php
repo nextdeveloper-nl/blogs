@@ -194,6 +194,12 @@ class AbstractPostsPerspectiveService
         if(!array_key_exists('iam_user_id', $data)) {
             $data['iam_user_id']    = UserHelper::me()->id;
         }
+        if (array_key_exists('common_domain_id', $data)) {
+            $data['common_domain_id'] = DatabaseHelper::uuidToId(
+                '\NextDeveloper\Commons\Database\Models\Domains',
+                $data['common_domain_id']
+            );
+        }
         if (array_key_exists('common_category_id', $data)) {
             $data['common_category_id'] = DatabaseHelper::uuidToId(
                 '\NextDeveloper\Commons\Database\Models\Categories',
@@ -260,13 +266,19 @@ class AbstractPostsPerspectiveService
                 $data['iam_user_id']
             );
         }
+        if (array_key_exists('common_domain_id', $data)) {
+            $data['common_domain_id'] = DatabaseHelper::uuidToId(
+                '\NextDeveloper\Commons\Database\Models\Domains',
+                $data['common_domain_id']
+            );
+        }
         if (array_key_exists('common_category_id', $data)) {
             $data['common_category_id'] = DatabaseHelper::uuidToId(
                 '\NextDeveloper\Commons\Database\Models\Categories',
                 $data['common_category_id']
             );
         }
-
+    
         Events::fire('updating:NextDeveloper\Blogs\PostsPerspective', $model);
 
         try {

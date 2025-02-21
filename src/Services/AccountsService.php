@@ -21,7 +21,7 @@ class AccountsService extends AbstractAccountsService
     public static function getBlogAccount(Posts $post) :?Accounts
     {
         return Accounts::withoutGlobalScopes()
-            ->where('common_domain_id', $post->common_domain_id)
+            ->where('id', $post->blog_account_id)
             ->where('is_auto_translate_enabled', true)
             ->first();
     }
