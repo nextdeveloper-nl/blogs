@@ -85,7 +85,7 @@ class AbstractPostsTransformer extends AbstractTransformer
             'created_at'  =>  $model->created_at,
             'updated_at'  =>  $model->updated_at,
             'deleted_at'  =>  $model->deleted_at,
-            'astract'  =>  $model->astract,
+            'abstract'  =>  $model->abstract,
             'alternates'  =>  $model->alternates,
             'alternate_of'  =>  $model->alternate_of,
             'locale'  =>  $model->locale,

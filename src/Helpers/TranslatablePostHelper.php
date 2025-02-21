@@ -46,7 +46,7 @@ trait TranslatablePostHelper
             'tags'              => $this->model->tags,
             'iam_account_id'    => $this->model->iam_account_id,
             'iam_user_id'       => $this->model->iam_user_id,
-            'astract'           => $this->model->astract,
+            'abstract'           => $this->model->abstract,
             'header_image'      => $this->model->header_image,
             'is_active'         => $this->model->is_active,
             'is_locked'         => $this->model->is_locked,

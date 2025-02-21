@@ -44,6 +44,8 @@ class UpdatePostTranslations extends AbstractAction
      */
     public function handle(): void
     {
+        $this->setProgress(0, 'Initiating post translation ...');
+
         if ($this->shouldSkipProcessing()) {
 
             $this->setFinished('Post is a draft or is an alternate of another post, please and try again.');
