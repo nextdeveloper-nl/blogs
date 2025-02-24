@@ -54,11 +54,12 @@ class AbstractPostsTransformer extends AbstractTransformer
      */
     public function transform(Posts $model)
     {
-        $iamAccountId = \NextDeveloper\IAM\Database\Models\Accounts::where('id', $model->iam_account_id)->first();
-        $iamUserId = \NextDeveloper\IAM\Database\Models\Users::where('id', $model->iam_user_id)->first();
-        $commonCategoryId = \NextDeveloper\Commons\Database\Models\Categories::where('id', $model->common_category_id)->first();
-        $commonDomainId = \NextDeveloper\Commons\Database\Models\Domains::where('id', $model->common_domain_id)->first();
-
+                                                $iamAccountId = \NextDeveloper\IAM\Database\Models\Accounts::where('id', $model->iam_account_id)->first();
+                                                            $iamUserId = \NextDeveloper\IAM\Database\Models\Users::where('id', $model->iam_user_id)->first();
+                                                            $commonCategoryId = \NextDeveloper\Commons\Database\Models\Categories::where('id', $model->common_category_id)->first();
+                                                            $commonDomainId = \NextDeveloper\Commons\Database\Models\Domains::where('id', $model->common_domain_id)->first();
+                                                            $blogAccountId = \NextDeveloper\Blogs\Database\Models\Accounts::where('id', $model->blog_account_id)->first();
+                        
         return $this->buildPayload(
             [
             'id'  =>  $model->uuid,
@@ -89,6 +90,7 @@ class AbstractPostsTransformer extends AbstractTransformer
             'alternates'  =>  $model->alternates,
             'alternate_of'  =>  $model->alternate_of,
             'locale'  =>  $model->locale,
+            'blog_account_id'  =>  $blogAccountId ? $blogAccountId->uuid : null,
             ]
         );
     }
@@ -177,6 +179,18 @@ class AbstractPostsTransformer extends AbstractTransformer
         return $this->collection($addresses, new AddressesTransformer());
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

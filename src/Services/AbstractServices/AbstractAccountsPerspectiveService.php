@@ -10,22 +10,22 @@ use NextDeveloper\IAM\Helpers\UserHelper;
 use NextDeveloper\Commons\Common\Cache\CacheHelper;
 use NextDeveloper\Commons\Helpers\DatabaseHelper;
 use NextDeveloper\Commons\Database\Models\AvailableActions;
-use NextDeveloper\Blogs\Database\Models\Accounts;
-use NextDeveloper\Blogs\Database\Filters\AccountsQueryFilter;
+use NextDeveloper\Blogs\Database\Models\AccountsPerspective;
+use NextDeveloper\Blogs\Database\Filters\AccountsPerspectiveQueryFilter;
 use NextDeveloper\Commons\Exceptions\ModelNotFoundException;
 use NextDeveloper\Events\Services\Events;
 use NextDeveloper\Commons\Exceptions\NotAllowedException;
 
 /**
- * This class is responsible from managing the data for Accounts
+ * This class is responsible from managing the data for AccountsPerspective
  *
- * Class AccountsService.
+ * Class AccountsPerspectiveService.
  *
  * @package NextDeveloper\Blogs\Database\Models
  */
-class AbstractAccountsService
+class AbstractAccountsPerspectiveService
 {
-    public static function get(AccountsQueryFilter $filter = null, array $params = []) : Collection|LengthAwarePaginator
+    public static function get(AccountsPerspectiveQueryFilter $filter = null, array $params = []) : Collection|LengthAwarePaginator
     {
         $enablePaginate = array_key_exists('paginate', $params);
 
@@ -38,7 +38,7 @@ class AbstractAccountsService
         * Please let me know if you have any other idea about this; baris.bulut@nextdeveloper.com
         */
         if($filter == null) {
-            $filter = new AccountsQueryFilter($request);
+            $filter = new AccountsPerspectiveQueryFilter($request);
         }
 
         $perPage = config('commons.pagination.per_page');
@@ -59,7 +59,7 @@ class AbstractAccountsService
             $filter->orderBy($params['orderBy']);
         }
 
-        $model = Accounts::filter($filter);
+        $model = AccountsPerspective::filter($filter);
 
         if($enablePaginate) {
             //  We are using this because we have been experiencing huge security problem when we use the paginate method.
@@ -81,7 +81,7 @@ class AbstractAccountsService
 
     public static function getAll()
     {
-        return Accounts::all();
+        return AccountsPerspective::all();
     }
 
     /**
@@ -90,14 +90,14 @@ class AbstractAccountsService
      * @param  $ref
      * @return mixed
      */
-    public static function getByRef($ref) : ?Accounts
+    public static function getByRef($ref) : ?AccountsPerspective
     {
-        return Accounts::findByRef($ref);
+        return AccountsPerspective::findByRef($ref);
     }
 
     public static function getActions()
     {
-        $model = Accounts::class;
+        $model = AccountsPerspective::class;
 
         $model = Str::remove('Database\\Models\\', $model);
 
@@ -112,16 +112,21 @@ class AbstractAccountsService
      */
     public static function doAction($objectId, $action, ...$params)
     {
-        $object = Accounts::where('uuid', $objectId)->first();
+        $object = AccountsPerspective::where('uuid', $objectId)->first();
 
-        $action = AvailableActions::where('name', $action)->first();
+        $action = AvailableActions::where('name', $action)
+            ->where('input', 'NextDeveloper\Blogs\AccountsPerspective')
+            ->first();
+
         $class = $action->class;
 
         if(class_exists($class)) {
             $action = new $class($object, $params);
+            $actionId = $action->getActionId();
+
             dispatch($action);
 
-            return $action->getActionId();
+            return $actionId;
         }
 
         return null;
@@ -131,11 +136,11 @@ class AbstractAccountsService
      * This method returns the model by lookint at its id
      *
      * @param  $id
-     * @return Accounts|null
+     * @return AccountsPerspective|null
      */
-    public static function getById($id) : ?Accounts
+    public static function getById($id) : ?AccountsPerspective
     {
-        return Accounts::where('id', $id)->first();
+        return AccountsPerspective::where('id', $id)->first();
     }
 
     /**
@@ -149,7 +154,7 @@ class AbstractAccountsService
     public static function relatedObjects($uuid, $object)
     {
         try {
-            $obj = Accounts::where('uuid', $uuid)->first();
+            $obj = AccountsPerspective::where('uuid', $uuid)->first();
 
             if(!$obj) {
                 throw new ModelNotFoundException('Cannot find the related model');
@@ -174,26 +179,12 @@ class AbstractAccountsService
      */
     public static function create(array $data)
     {
-        if (array_key_exists('common_domain_id', $data)) {
-            $data['common_domain_id'] = DatabaseHelper::uuidToId(
-                '\NextDeveloper\Commons\Database\Models\Domains',
-                $data['common_domain_id']
-            );
-        }
-        if (array_key_exists('common_language_id', $data)) {
-            $data['common_language_id'] = DatabaseHelper::uuidToId(
-                '\NextDeveloper\Commons\Database\Models\Languages',
-                $data['common_language_id']
-            );
-        }
-                        
+        
         try {
-            $model = Accounts::create($data);
+            $model = AccountsPerspective::create($data);
         } catch(\Exception $e) {
             throw $e;
         }
-
-        Events::fire('created:NextDeveloper\Blogs\Accounts', $model);
 
         return $model->fresh();
     }
@@ -202,9 +193,9 @@ class AbstractAccountsService
      * This function expects the ID inside the object.
      *
      * @param  array $data
-     * @return Accounts
+     * @return AccountsPerspective
      */
-    public static function updateRaw(array $data) : ?Accounts
+    public static function updateRaw(array $data) : ?AccountsPerspective
     {
         if(array_key_exists('id', $data)) {
             return self::update($data['id'], $data);
@@ -225,7 +216,7 @@ class AbstractAccountsService
      */
     public static function update($id, array $data)
     {
-        $model = Accounts::where('uuid', $id)->first();
+        $model = AccountsPerspective::where('uuid', $id)->first();
 
         if(!$model) {
             throw new NotAllowedException(
@@ -234,29 +225,13 @@ class AbstractAccountsService
             );
         }
 
-        if (array_key_exists('common_domain_id', $data)) {
-            $data['common_domain_id'] = DatabaseHelper::uuidToId(
-                '\NextDeveloper\Commons\Database\Models\Domains',
-                $data['common_domain_id']
-            );
-        }
-        if (array_key_exists('common_language_id', $data)) {
-            $data['common_language_id'] = DatabaseHelper::uuidToId(
-                '\NextDeveloper\Commons\Database\Models\Languages',
-                $data['common_language_id']
-            );
-        }
-    
-        Events::fire('updating:NextDeveloper\Blogs\Accounts', $model);
-
+        
         try {
             $isUpdated = $model->update($data);
             $model = $model->fresh();
         } catch(\Exception $e) {
             throw $e;
         }
-
-        Events::fire('updated:NextDeveloper\Blogs\Accounts', $model);
 
         return $model->fresh();
     }
@@ -273,7 +248,7 @@ class AbstractAccountsService
      */
     public static function delete($id)
     {
-        $model = Accounts::where('uuid', $id)->first();
+        $model = AccountsPerspective::where('uuid', $id)->first();
 
         if(!$model) {
             throw new NotAllowedException(
@@ -281,8 +256,6 @@ class AbstractAccountsService
                 'Maybe you dont have the permission to update this object?'
             );
         }
-
-        Events::fire('deleted:NextDeveloper\Blogs\Accounts', $model);
 
         try {
             $model = $model->delete();

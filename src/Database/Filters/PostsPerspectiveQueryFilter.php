@@ -100,6 +100,12 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
         return $this->metaKeywords($value);
     }
         
+    public function locale($value)
+    {
+        return $this->builder->where('locale', 'like', '%' . $value . '%');
+    }
+
+        
     public function author($value)
     {
         return $this->builder->where('author', 'like', '%' . $value . '%');
@@ -184,6 +190,25 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
     public function bonus_points($value)
     {
         return $this->bonusPoints($value);
+    }
+    
+    public function alternateOf($value)
+    {
+        $operator = substr($value, 0, 1);
+
+        if ($operator != '<' || $operator != '>') {
+            $operator = '=';
+        } else {
+            $value = substr($value, 1);
+        }
+
+        return $this->builder->where('alternate_of', $operator, $value);
+    }
+
+        //  This is an alias function of alternateOf
+    public function alternate_of($value)
+    {
+        return $this->alternateOf($value);
     }
     
     public function isActive($value)
@@ -358,6 +383,9 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
     }
     
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+
+
 
 
 }

@@ -32,7 +32,9 @@ class PostsUpdateRequest extends AbstractFormRequest
         'alternates' => '',
         'alternate_of' => 'nullable|integer',
         'locale' => 'string',
+        'blog_account_id' => 'nullable|exists:blog_accounts,uuid|uuid',
         ];
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 }

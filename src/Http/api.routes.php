@@ -44,6 +44,27 @@ Route::prefix('blogs')->group(
             }
         );
 
+        Route::prefix('accounts-perspective')->group(
+            function () {
+                Route::get('/', 'AccountsPerspective\AccountsPerspectiveController@index');
+                Route::get('/actions', 'AccountsPerspective\AccountsPerspectiveController@getActions');
+
+                Route::get('{blog_accounts_perspective}/tags ', 'AccountsPerspective\AccountsPerspectiveController@tags');
+                Route::post('{blog_accounts_perspective}/tags ', 'AccountsPerspective\AccountsPerspectiveController@saveTags');
+                Route::get('{blog_accounts_perspective}/addresses ', 'AccountsPerspective\AccountsPerspectiveController@addresses');
+                Route::post('{blog_accounts_perspective}/addresses ', 'AccountsPerspective\AccountsPerspectiveController@saveAddresses');
+
+                Route::get('/{blog_accounts_perspective}/{subObjects}', 'AccountsPerspective\AccountsPerspectiveController@relatedObjects');
+                Route::get('/{blog_accounts_perspective}', 'AccountsPerspective\AccountsPerspectiveController@show');
+
+                Route::post('/', 'AccountsPerspective\AccountsPerspectiveController@store');
+                Route::post('/{blog_accounts_perspective}/do/{action}', 'AccountsPerspective\AccountsPerspectiveController@doAction');
+
+                Route::patch('/{blog_accounts_perspective}', 'AccountsPerspective\AccountsPerspectiveController@update');
+                Route::delete('/{blog_accounts_perspective}', 'AccountsPerspective\AccountsPerspectiveController@destroy');
+            }
+        );
+
         Route::prefix('posts-perspective')->group(
             function () {
                 Route::get('/', 'PostsPerspective\PostsPerspectiveController@index');
@@ -80,8 +101,49 @@ Route::prefix('blogs')->group(
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

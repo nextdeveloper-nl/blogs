@@ -2,6 +2,7 @@
 
 namespace NextDeveloper\Blogs\Helpers;
 
+use NextDeveloper\Commons\Database\Models\Languages;
 use NextDeveloper\I18n\Services\I18nTranslationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -61,23 +62,19 @@ trait TranslatablePostHelper
     /**
      * Translates content for the given target locale
      */
-    protected function translateContent(string $target): array
+    protected function translateContent(Languages $target): array
     {
-        if (empty($target)) {
-            throw new \InvalidArgumentException('Translation target locale cannot be empty');
-        }
-
         return collect($this->getTranslatableFields())
             ->filter(fn($field) => !empty($this->model->{$field}))
             ->mapWithKeys(function($field) use ($target) {
                 try {
                     if ($field === 'body') {
-                        return [$field => $this->translateBodyWithChunking($target)];
+                        return [$field => $this->translateBodyWithChunking($target->code)];
                     }
 
                     $translate = I18nTranslationService::translate(
                         ['text' => $this->model->{$field}],
-                        $target
+                        $target->code
                     );
 
                     return [

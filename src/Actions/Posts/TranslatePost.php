@@ -4,6 +4,7 @@ namespace NextDeveloper\Blogs\Actions\Posts;
 
 use App\Models\User;
 use Exception;
+use NextDeveloper\Blogs\Services\AccountsService;
 use NextDeveloper\Commons\Actions\AbstractAction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +15,8 @@ use NextDeveloper\Commons\Database\Models\Domains;
 use NextDeveloper\Commons\Database\Models\Languages;
 use NextDeveloper\Commons\Exceptions\NotAllowedException;
 use NextDeveloper\Commons\Helpers\SlugHelper;
+use NextDeveloper\I18n\Services\I18nTranslationService;
+use NextDeveloper\IAM\Database\Scopes\AuthorizationScope;
 use NextDeveloper\IAM\Helpers\UserHelper;
 
 /**
@@ -35,23 +38,23 @@ class TranslatePost extends AbstractAction
     /**
      * @throws NotAllowedException
      */
-    public function __construct(Posts $model)
+    public function __construct(Posts $model, $params = null, $previousAction = null)
     {
-        UserHelper::setUserById($model->iam_user_id);
-        UserHelper::setCurrentAccountById($model->iam_account_id);
-
         $this->model = $model;
 
-        parent::__construct();
+        parent::__construct($params, $previousAction);
     }
 
     /**
      * Main handler function to process post creation and initiate translations.
      *
      * @throws Exception
+     * @throws \Throwable
      */
     public function handle(): void
     {
+        $this->setProgress(0, 'Initiating post translation ...');
+
         DB::beginTransaction();
 
         try {
@@ -63,30 +66,30 @@ class TranslatePost extends AbstractAction
             }
 
             // Retrieve the blog account associated with the post's domain
-            $blogAccount = $this->getBlogAccount();
+            $blogAccount = AccountsService::getBlogAccount($this->model);
             // 10% progress
             $this->setProgress(10, 'Retrieving blog account ...');
 
-            if (!$blogAccount || !$blogAccount->is_auto_translate_enabled) {
+            if(!$blogAccount) {
+                $this->setFinished('Cannot find a blog account for this blog post. This is weird because there should be. Please consult to your Leo provider.');
+            }
+
+            if (!$blogAccount->is_auto_translate_enabled) {
                 $this->setFinished('Auto-translation is not enabled for this blog account. Please enable it and try again.');
                 return;
             }
 
-            // Decode and clean alternates
-            $alternates = $this->decodeAlternates($blogAccount->alternate);
-            // 20% progress
+            if(!array_key_exists('blog_account_ids', $blogAccount->alternate))
+                $this->setFinished('Cannot find a destination language to translate the post. Please check for the blog account alternates.');
+
             $this->setProgress(20, 'Alternates decoded ...');
 
-            // Validate alternates against the database
-            $targets = $this->getTranslationTargets($alternates);
-            // 30% progress
-            $this->setProgress(30, 'Alternates validated ...');
+            foreach ($blogAccount->alternate['blog_account_ids'] as $alternate) {
+                $destinationAccount = AccountsService::getById($alternate);
+                $targetLanguage = self::getTranslationTarget($destinationAccount->common_language_id);
+                $this->setProgress(30, 'Translating to: ' . $targetLanguage->code);
 
-            // Create translations for each target locale
-            foreach ($targets as $target) {
-                // 40% progress
-                $this->setProgress(40, "Translating post for locale: $target ...");
-                $this->createTranslation($target);
+                $this->createTranslation($targetLanguage);
             }
 
             // 90% progress
@@ -108,21 +111,6 @@ class TranslatePost extends AbstractAction
     private function shouldSkipProcessing(): bool
     {
         return $this->model->is_draft || $this->model->alternate_of;
-    }
-
-    /**
-     * Retrieves the blog account associated with the post's domain.
-     *
-     * @return Accounts|null
-     */
-    private function getBlogAccount(): ?Accounts
-    {
-        $query = Accounts::withoutGlobalScopes();
-
-        return $query
-            ->where('common_domain_id', $this->model->common_domain_id)
-            ->where('is_auto_translate_enabled', true)
-            ->first();
     }
 
     /**
@@ -163,137 +151,126 @@ class TranslatePost extends AbstractAction
      * @param mixed $alternateConfig JSON string or array containing domain or language IDs.
      * @return array List of target locales for translation.
      */
-    private function getTranslationTargets(mixed $alternateConfig): array
+    private function getTranslationTarget($commonLanguageId): Languages
     {
-        // Decode the alternate configuration if it's a JSON string
-        $alternateConfig = is_string($alternateConfig) ? json_decode($alternateConfig, true) : $alternateConfig;
-
-        // Check if there are domain IDs specified in the configuration
-        if (!empty($alternateConfig['common_domain_ids'])) {
-
-            // Query the Domains model without global scopes
-            $query = Domains::withoutGlobalScopes();
-
-            // Retrieve domains matching the specified IDs and extract the locale from the domain name
-            return $query
-                ->whereIn('id', $alternateConfig['common_domain_ids'])
-                ->get()
-                ->map(function($domain) {
-                    // Extract the last part of the domain name as the locale
-                    $parts = explode('.', $domain->name);
-                    return strtolower(end($parts));
-                })
-                ->filter() // Remove any empty values
-                ->unique() // Ensure each locale is unique
-                ->values() // Reset the array keys
-                ->toArray(); // Convert the collection to an array
-        }
-
-        // Check if there are language IDs specified in the configuration
-        if (!empty($alternateConfig['common_language_ids'])) {
-
-            // Query the Languages model without global scopes
-            $query = Languages::withoutGlobalScopes();
-
-            // Retrieve language codes matching the specified IDs
-            return $query
-                ->whereIn('id', $alternateConfig['common_language_ids'])
-                ->pluck('iso_639_1_code')
-                ->map(function($code) {
-                    // Convert the language code to lowercase
-                    return strtolower($code);
-                })
-                ->filter() // Remove any empty values
-                ->unique() // Ensure each locale is unique
-                ->values() // Reset the array keys
-                ->toArray(); // Convert the collection to an array
-        }
-
-        // Return an empty array if no valid targets are found
-        return [];
+        return Languages::withoutGlobalScope(AuthorizationScope::class)
+            ->where('id', $commonLanguageId)
+            ->first();
     }
 
     /**
-     * @throws Exception
+     * @throws Exception|\Throwable
      */
-    private function createTranslation(string $target): void
+    private function createTranslation(Languages $target): void
     {
-        $target = strtolower(trim($target));
+        // Lock the original post for updates
+        $lockedPost = Posts::where('id', $this->model->id)
+            ->lockForUpdate()
+            ->first();
 
-        DB::transaction(function() use ($target) {
-            // Lock the original post for updates
-            $lockedPost = Posts::where('id', $this->model->id)
-                ->lockForUpdate()
-                ->first();
+        // Handle JSON decoding with proper type checking
+        $alternates = is_string($lockedPost->alternates)
+            ? json_decode($lockedPost->alternates ?? '[]', true) ?? []
+            : (is_array($lockedPost->alternates) ? $lockedPost->alternates : []);
 
-            // Handle JSON decoding with proper type checking
-            $alternates = is_string($lockedPost->alternates)
-                ? json_decode($lockedPost->alternates ?? '[]', true) ?? []
-                : (is_array($lockedPost->alternates) ? $lockedPost->alternates : []);
+        $existingLocales = array_column($alternates, 'locale');
 
-            $existingLocales = array_column($alternates, 'locale');
+        if (in_array($target->code, $existingLocales, true)) {
+            Log::warning('Duplicate locale prevented', [
+                'post_id' => $lockedPost->id,
+                'locale' => $target
+            ]);
+            return;
+        }
 
-            if (in_array($target, $existingLocales, true)) {
-                Log::warning('Duplicate locale prevented', [
-                    'post_id' => $lockedPost->id,
-                    'locale' => $target
-                ]);
-                return;
-            }
+        // Additional database check
+        $existingTranslation = Posts::where('alternate_of', $lockedPost->id)
+            ->where('locale', trim($target->code))
+            ->exists();
 
-            // Additional database check
-            $existingTranslation = Posts::where('alternate_of', $lockedPost->id)
-                ->where('locale', $target)
-                ->exists();
+        if ($existingTranslation) {
+            Log::warning('Existing translation found in DB', [
+                'post_id' => $lockedPost->id,
+                'locale' => $target->code
+            ]);
+            return;
+        }
 
-            if ($existingTranslation) {
-                Log::warning('Existing translation found in DB', [
-                    'post_id' => $lockedPost->id,
-                    'locale' => $target
-                ]);
-                return;
-            }
+        /**
+         * Making translations
+         */
+        $title = I18nTranslationService::translate($this->model->title, $target->code);
+        $body = I18nTranslationService::translate($this->model->body, $target->code);
 
-            // Translate content
-            $translatedContent = $this->translateContent($target);
+        $metaTitle = null;
 
-            // add slug
-            $translatedContent['slug'] = SlugHelper::generate(
-                $translatedContent['title'] ?? $this->model->title,
-                Posts::class
-            );
+        //  Check title
+        if(!$this->model->meta_title) {
+            $metaTitle = $title;
+        } else {
+            $metaTitle = I18nTranslationService::translate($this->model->meta_title, $target->code);
+        }
 
-            // Replace manual field assignments with:
-            $translatedContent = array_merge(
-                $translatedContent,
-                $this->getCommonFields(),
-                [
-                    'alternate_of' => $this->model->id,
-                    'locale' => $target,
-                    'slug' => $translatedContent['slug']
-                ]
-            );
+        $metaDescription = null;
 
-            $translatedPost = Posts::forceCreateQuietly($translatedContent);
+        if($this->model->meta_description) {
+            $description = I18nTranslationService::translate($this->model->meta_description, $target->code);
+        }
 
-            if (!$translatedPost) {
-                throw new Exception("Failed to create translated post for locale: $target");
-            }
+        $metaKeywords = null;
 
-            // Update original post's alternates with proper JSON encoding
-            $newAlternate = [
-                'id' => $translatedPost->id,
-                'locale' => $target,
-                'slug' => $translatedPost->slug
-            ];
+        if($this->model->meta_keywords) {
+            $metaKeywords= I18nTranslationService::translate($this->model->meta_keywords, $target->code);
+        }
 
-            // Update using the locked model instance
-            $lockedPost->alternates = $this->cleanAlternates(
-                array_merge($alternates, [$newAlternate])
-            );
+        //  Creating the translated blog object
+        $translatedContent = [
+            'title' =>  $title ? $title->translation : $this->model->title,
+            'body'  =>  $body ? $body->translation : $this->model->body,
+        ];
+
+        $translatedContent = array_merge($translatedContent, [
+            'meta_title'    =>  $metaTitle ? $metaTitle->translation : $translatedContent['title'],
+            'meta_description'  =>   $metaDescription ? $metaDescription->translation : $this->model->meta_description,
+            'meta_keywords'  =>   $metaKeywords ? $metaKeywords->translation : $this->model->meta_keywords
+        ]);
+
+        // add slug
+        $translatedContent['slug'] = SlugHelper::generate(
+            $translatedContent['title'] ?? $this->model->title,
+            Posts::class
+        );
+
+        // Replace manual field assignments with:
+        $translatedContent = array_merge(
+            $translatedContent,
+            $this->getCommonFields(),
+            [
+                'alternate_of' => $this->model->id,
+                'locale' => trim($target->code),
+                'slug' => $translatedContent['slug']
+            ]
+        );
+
+        $translatedPost = Posts::forceCreateQuietly($translatedContent);
+
+        if (!$translatedPost) {
+            throw new Exception("Failed to create translated post for locale: $target");
+        }
+
+        // Update original post's alternates with proper JSON encoding
+        $newAlternate = [
+            'id' => $translatedPost->id,
+            'locale' => trim($target->code),
+            'slug' => $translatedPost->slug
+        ];
+
+        // Update using the locked model instance
+        $lockedPost->alternates = $this->cleanAlternates(
+            array_merge($alternates, [$newAlternate])
+        );
 
 
-            $lockedPost->saveQuietly();
-        });
+        $lockedPost->saveQuietly();
     }
 }

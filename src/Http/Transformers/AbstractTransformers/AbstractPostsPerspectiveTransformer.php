@@ -81,6 +81,9 @@ class AbstractPostsPerspectiveTransformer extends AbstractTransformer
             'iam_account_id'  =>  $iamAccountId ? $iamAccountId->uuid : null,
             'iam_user_id'  =>  $iamUserId ? $iamUserId->uuid : null,
             'common_domain_id'  =>  $commonDomainId ? $commonDomainId->uuid : null,
+            'locale'  =>  $model->locale,
+            'alternates'  =>  $model->alternates,
+            'alternate_of'  =>  $model->alternate_of,
             'author'  =>  $model->author,
             'team'  =>  $model->team,
             'common_category_id'  =>  $commonCategoryId ? $commonCategoryId->uuid : null,
@@ -177,6 +180,9 @@ class AbstractPostsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($addresses, new AddressesTransformer());
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+
+
 
 
 }

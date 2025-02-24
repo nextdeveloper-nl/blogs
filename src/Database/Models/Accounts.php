@@ -10,6 +10,8 @@ use NextDeveloper\Blogs\Database\Observers\AccountsObserver;
 use NextDeveloper\Commons\Database\Traits\UuidId;
 use NextDeveloper\Commons\Common\Cache\Traits\CleanCache;
 use NextDeveloper\Commons\Database\Traits\Taggable;
+use NextDeveloper\Commons\Database\Traits\HasStates;
+use NextDeveloper\Commons\Database\Traits\RunAsAdministrator;
 
 /**
  * Accounts model.
@@ -23,12 +25,14 @@ use NextDeveloper\Commons\Database\Traits\Taggable;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $deleted_at
+ * @property $limits
+ * @property boolean $is_suspended
+ * @property integer $common_language_id
  */
 class Accounts extends Model
 {
-    use Filterable, UuidId, CleanCache, Taggable;
+    use Filterable, UuidId, CleanCache, Taggable, HasStates, RunAsAdministrator;
     use SoftDeletes;
-
 
     public $timestamps = true;
 
@@ -44,6 +48,9 @@ class Accounts extends Model
             'common_domain_id',
             'alternate',
             'is_auto_translate_enabled',
+            'limits',
+            'is_suspended',
+            'common_language_id',
     ];
 
     /**
@@ -73,6 +80,9 @@ class Accounts extends Model
     'created_at' => 'datetime',
     'updated_at' => 'datetime',
     'deleted_at' => 'datetime',
+    'limits' => 'array',
+    'is_suspended' => 'boolean',
+    'common_language_id' => 'integer',
     ];
 
     /**
@@ -133,7 +143,24 @@ class Accounts extends Model
         }
     }
 
+    public function domains() : \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\NextDeveloper\Commons\Database\Models\Domains::class);
+    }
+    
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
