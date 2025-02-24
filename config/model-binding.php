@@ -1445,5 +1445,17 @@ return [
         return NextDeveloper\Blogs\Database\Models\BlogPostsPerspective::findByRef($value);
 },
 
+'blogaccount' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogAccount::findByRef($value);
+},
+
+'blogpost' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPost::findByRef($value);
+},
+
+'blogpostsperspective' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPostsPerspective::findByRef($value);
+},
+
 // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 ];

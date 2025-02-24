@@ -23,6 +23,9 @@ use NextDeveloper\Commons\Database\Traits\Taggable;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $deleted_at
+ * @property $limits
+ * @property boolean $is_suspended
+ * @property integer $common_language_id
  */
 class Accounts extends Model
 {
@@ -44,6 +47,9 @@ class Accounts extends Model
             'common_domain_id',
             'alternate',
             'is_auto_translate_enabled',
+            'limits',
+            'is_suspended',
+            'common_language_id',
     ];
 
     /**
@@ -73,6 +79,9 @@ class Accounts extends Model
     'created_at' => 'datetime',
     'updated_at' => 'datetime',
     'deleted_at' => 'datetime',
+    'limits' => 'array',
+    'is_suspended' => 'boolean',
+    'common_language_id' => 'integer',
     ];
 
     /**

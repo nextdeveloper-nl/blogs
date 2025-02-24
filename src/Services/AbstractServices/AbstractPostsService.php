@@ -114,11 +114,11 @@ class AbstractPostsService
     {
         $object = Posts::where('uuid', $objectId)->first();
 
-        $action = '\\NextDeveloper\\Blogs\\Actions\\Posts\\' . Str::studly($action);
+        $action = AvailableActions::where('name', $action)->first();
+        $class = $action->class;
 
-        if(class_exists($action)) {
-            $action = new $action($object, $params);
-
+        if(class_exists($class)) {
+            $action = new $class($object, $params);
             dispatch($action);
 
             return $action->getActionId();
@@ -206,7 +206,13 @@ class AbstractPostsService
                 $data['common_domain_id']
             );
         }
-
+        if (array_key_exists('blog_account_id', $data)) {
+            $data['blog_account_id'] = DatabaseHelper::uuidToId(
+                '\NextDeveloper\Blogs\Database\Models\Accounts',
+                $data['blog_account_id']
+            );
+        }
+                        
         try {
             $model = Posts::create($data);
         } catch(\Exception $e) {
@@ -278,7 +284,13 @@ class AbstractPostsService
                 $data['common_domain_id']
             );
         }
-
+        if (array_key_exists('blog_account_id', $data)) {
+            $data['blog_account_id'] = DatabaseHelper::uuidToId(
+                '\NextDeveloper\Blogs\Database\Models\Accounts',
+                $data['blog_account_id']
+            );
+        }
+    
         Events::fire('updating:NextDeveloper\Blogs\Posts', $model);
 
         try {

@@ -46,6 +46,7 @@ use NextDeveloper\Commons\Database\Traits\Taggable;
  * @property $alternates
  * @property integer $alternate_of
  * @property string $locale
+ * @property integer $blog_account_id
  */
 class Posts extends Model
 {
@@ -87,6 +88,7 @@ class Posts extends Model
             'alternates',
             'alternate_of',
             'locale',
+            'blog_account_id',
     ];
 
     /**
@@ -135,6 +137,7 @@ class Posts extends Model
     'alternates' => 'array',
     'alternate_of' => 'integer',
     'locale' => 'string',
+    'blog_account_id' => 'integer',
     ];
 
     /**
