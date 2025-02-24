@@ -10,23 +10,49 @@ use NextDeveloper\Commons\Database\Filters\AbstractQueryFilter;
  * This class automatically puts where clause on database so that use can filter
  * data returned from the query.
  */
-class AccountsQueryFilter extends AbstractQueryFilter
+class AccountsPerspectiveQueryFilter extends AbstractQueryFilter
 {
+    /**
+     * Filter by tags
+     *
+     * @param  $values
+     * @return Builder
+     */
+    public function tags($values)
+    {
+        $tags = explode(',', $values);
+
+        $search = '';
+
+        for($i = 0; $i < count($tags); $i++) {
+            $search .= "'" . trim($tags[$i]) . "',";
+        }
+
+        $search = substr($search, 0, -1);
+
+        return $this->builder->whereRaw('tags @> ARRAY[' . $search . ']');
+    }
 
     /**
      * @var Builder
      */
     protected $builder;
-
-    public function isAutoTranslateEnabled($value)
+    
+    public function name($value)
     {
-        return $this->builder->where('is_auto_translate_enabled', $value);
+        return $this->builder->where('name', 'like', '%' . $value . '%');
     }
 
-        //  This is an alias function of isAutoTranslateEnabled
-    public function is_auto_translate_enabled($value)
+    
+    public function isActive($value)
     {
-        return $this->isAutoTranslateEnabled($value);
+        return $this->builder->where('is_active', $value);
+    }
+
+        //  This is an alias function of isActive
+    public function is_active($value)
+    {
+        return $this->isActive($value);
     }
      
     public function isSuspended($value)
@@ -38,6 +64,17 @@ class AccountsQueryFilter extends AbstractQueryFilter
     public function is_suspended($value)
     {
         return $this->isSuspended($value);
+    }
+     
+    public function isAutoTranslateEnabled($value)
+    {
+        return $this->builder->where('is_auto_translate_enabled', $value);
+    }
+
+        //  This is an alias function of isAutoTranslateEnabled
+    public function is_auto_translate_enabled($value)
+    {
+        return $this->isAutoTranslateEnabled($value);
     }
      
     public function createdAtStart($date)
@@ -137,18 +174,5 @@ class AccountsQueryFilter extends AbstractQueryFilter
     }
     
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

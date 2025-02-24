@@ -5,6 +5,7 @@ namespace NextDeveloper\Blogs\Services;
 use NextDeveloper\Blogs\Database\Models\Accounts;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Blogs\Services\AbstractServices\AbstractAccountsService;
+use NextDeveloper\IAM\Database\Scopes\AuthorizationScope;
 
 /**
  * This class is responsible from managing the data for Accounts
@@ -20,7 +21,7 @@ class AccountsService extends AbstractAccountsService
 
     public static function getBlogAccount(Posts $post) :?Accounts
     {
-        return Accounts::withoutGlobalScopes()
+        return Accounts::withoutGlobalScope(AuthorizationScope::class)
             ->where('id', $post->blog_account_id)
             ->where('is_auto_translate_enabled', true)
             ->first();

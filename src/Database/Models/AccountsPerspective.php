@@ -2,62 +2,44 @@
 
 namespace NextDeveloper\Blogs\Database\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+use NextDeveloper\Commons\Database\Traits\HasStates;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
 use NextDeveloper\Commons\Database\Traits\Filterable;
-use NextDeveloper\Blogs\Database\Observers\PostsPerspectiveObserver;
+use NextDeveloper\Blogs\Database\Observers\AccountsPerspectiveObserver;
 use NextDeveloper\Commons\Database\Traits\UuidId;
 use NextDeveloper\Commons\Common\Cache\Traits\CleanCache;
 use NextDeveloper\Commons\Database\Traits\Taggable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use NextDeveloper\Commons\Database\Traits\HasStates;
 use NextDeveloper\Commons\Database\Traits\RunAsAdministrator;
 
 /**
- * PostsPerspective model.
+ * AccountsPerspective model.
  *
  * @package  NextDeveloper\Blogs\Database\Models
  * @property integer $id
  * @property string $uuid
- * @property string $slug
- * @property string $title
- * @property string $body
- * @property string $header_image
- * @property string $meta_title
- * @property string $meta_description
- * @property string $meta_keywords
- * @property integer $reply_count
- * @property integer $read_count
- * @property integer $bonus_points
+ * @property string $name
  * @property boolean $is_active
- * @property boolean $is_locked
- * @property boolean $is_pinned
- * @property boolean $is_draft
- * @property boolean $is_markdown
  * @property array $tags
- * @property integer $iam_account_id
- * @property integer $iam_user_id
  * @property integer $common_domain_id
- * @property string $locale
- * @property $alternates
- * @property integer $alternate_of
- * @property string $author
- * @property string $team
- * @property integer $common_category_id
- * @property string $category
- * @property string $domain_name
+ * @property integer $common_language_id
+ * @property $limits
+ * @property boolean $is_suspended
+ * @property boolean $is_auto_translate_enabled
+ * @property $alternate
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $deleted_at
  */
-class PostsPerspective extends Model
+class AccountsPerspective extends Model
 {
     use Filterable, UuidId, CleanCache, Taggable, HasStates, RunAsAdministrator;
     use SoftDeletes;
 
     public $timestamps = true;
 
-    protected $table = 'blog_posts_perspective';
+    protected $table = 'blog_accounts_perspective';
 
 
     /**
@@ -66,33 +48,15 @@ class PostsPerspective extends Model
     protected $guarded = [];
 
     protected $fillable = [
-            'slug',
-            'title',
-            'body',
-            'header_image',
-            'meta_title',
-            'meta_description',
-            'meta_keywords',
-            'reply_count',
-            'read_count',
-            'bonus_points',
+            'name',
             'is_active',
-            'is_locked',
-            'is_pinned',
-            'is_draft',
-            'is_markdown',
             'tags',
-            'iam_account_id',
-            'iam_user_id',
             'common_domain_id',
-            'locale',
-            'alternates',
-            'alternate_of',
-            'author',
-            'team',
-            'common_category_id',
-            'category',
-            'domain_name',
+            'common_language_id',
+            'limits',
+            'is_suspended',
+            'is_auto_translate_enabled',
+            'alternate',
     ];
 
     /**
@@ -116,31 +80,15 @@ class PostsPerspective extends Model
      */
     protected $casts = [
     'id' => 'integer',
-    'slug' => 'string',
-    'title' => 'string',
-    'body' => 'string',
-    'header_image' => 'string',
-    'meta_title' => 'string',
-    'meta_description' => 'string',
-    'meta_keywords' => 'string',
-    'reply_count' => 'integer',
-    'read_count' => 'integer',
-    'bonus_points' => 'integer',
+    'name' => 'string',
     'is_active' => 'boolean',
-    'is_locked' => 'boolean',
-    'is_pinned' => 'boolean',
-    'is_draft' => 'boolean',
-    'is_markdown' => 'boolean',
     'tags' => \NextDeveloper\Commons\Database\Casts\TextArray::class,
     'common_domain_id' => 'integer',
-    'locale' => 'string',
-    'alternates' => 'array',
-    'alternate_of' => 'integer',
-    'author' => 'string',
-    'team' => 'string',
-    'common_category_id' => 'integer',
-    'category' => 'string',
-    'domain_name' => 'string',
+    'common_language_id' => 'integer',
+    'limits' => 'array',
+    'is_suspended' => 'boolean',
+    'is_auto_translate_enabled' => 'boolean',
+    'alternate' => 'array',
     'created_at' => 'datetime',
     'updated_at' => 'datetime',
     'deleted_at' => 'datetime',
@@ -177,7 +125,7 @@ class PostsPerspective extends Model
         parent::boot();
 
         //  We create and add Observer even if we wont use it.
-        parent::observe(PostsPerspectiveObserver::class);
+        parent::observe(AccountsPerspectiveObserver::class);
 
         self::registerScopes();
     }
@@ -185,7 +133,7 @@ class PostsPerspective extends Model
     public static function registerScopes()
     {
         $globalScopes = config('blogs.scopes.global');
-        $modelScopes = config('blogs.scopes.blog_posts_perspective');
+        $modelScopes = config('blogs.scopes.blog_accounts_perspective');
 
         if(!$modelScopes) { $modelScopes = [];
         }
@@ -205,9 +153,5 @@ class PostsPerspective extends Model
     }
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
-
-
-
-
 
 }
