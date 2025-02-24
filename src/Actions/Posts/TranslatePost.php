@@ -55,8 +55,6 @@ class TranslatePost extends AbstractAction
     {
         $this->setProgress(0, 'Initiating post translation ...');
 
-        DB::beginTransaction();
-
         try {
             // Skip processing if post is a draft or already a translation
             if ($this->shouldSkipProcessing()) {
@@ -95,12 +93,9 @@ class TranslatePost extends AbstractAction
             // 90% progress
             $this->setProgress(90, 'Post translations created ...');
 
-            DB::commit();
             // 100% progress
             $this->setFinished('Post translations created successfully.');
         } catch (Exception $e) {
-            DB::rollBack();
-
             $this->handleTranslationError($e);
         }
     }
