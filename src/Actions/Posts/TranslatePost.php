@@ -89,7 +89,7 @@ class TranslatePost extends AbstractAction
                 $targetLanguage = self::getTranslationTarget($destinationAccount->common_language_id);
                 $this->setProgress(30, 'Translating to: ' . $targetLanguage->code);
 
-                $this->createTranslation($targetLanguage);
+                $this->createTranslation($targetLanguage,  $destinationAccount);
             }
 
             // 90% progress
@@ -161,7 +161,7 @@ class TranslatePost extends AbstractAction
     /**
      * @throws Exception|\Throwable
      */
-    private function createTranslation(Languages $target): void
+    private function createTranslation(Languages $target, Accounts $destinationAccount): void
     {
         // Lock the original post for updates
         $lockedPost = Posts::where('id', $this->model->id)
@@ -248,7 +248,8 @@ class TranslatePost extends AbstractAction
             [
                 'alternate_of' => $this->model->id,
                 'locale' => trim($target->code),
-                'slug' => $translatedContent['slug']
+                'slug' => $translatedContent['slug'],
+                'blog_account_id'   =>  $destinationAccount->id
             ]
         );
 
