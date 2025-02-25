@@ -22,6 +22,7 @@ use NextDeveloper\Commons\Database\Traits\RunAsAdministrator;
  * @property string $slug
  * @property string $title
  * @property string $body
+ * @property string $abstract
  * @property string $header_image
  * @property string $meta_title
  * @property string $meta_description
@@ -69,6 +70,7 @@ class PostsPerspective extends Model
             'slug',
             'title',
             'body',
+            'abstract',
             'header_image',
             'meta_title',
             'meta_description',
@@ -119,6 +121,7 @@ class PostsPerspective extends Model
     'slug' => 'string',
     'title' => 'string',
     'body' => 'string',
+    'abstract' => 'string',
     'header_image' => 'string',
     'meta_title' => 'string',
     'meta_description' => 'string',
@@ -205,6 +208,7 @@ class PostsPerspective extends Model
     }
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 
 
 

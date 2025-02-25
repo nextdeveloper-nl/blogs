@@ -65,6 +65,7 @@ class AbstractPostsPerspectiveTransformer extends AbstractTransformer
             'slug'  =>  $model->slug,
             'title'  =>  $model->title,
             'body'  =>  $model->body,
+            'abstract'  =>  $model->abstract,
             'header_image'  =>  $model->header_image,
             'meta_title'  =>  $model->meta_title,
             'meta_description'  =>  $model->meta_description,
@@ -180,6 +181,7 @@ class AbstractPostsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($addresses, new AddressesTransformer());
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 
 
 

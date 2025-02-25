@@ -56,6 +56,12 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
     }
 
         
+    public function abstract($value)
+    {
+        return $this->builder->where('abstract', 'like', '%' . $value . '%');
+    }
+
+        
     public function headerImage($value)
     {
         return $this->builder->where('header_image', 'like', '%' . $value . '%');
@@ -383,6 +389,7 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
     }
     
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 
 
 
