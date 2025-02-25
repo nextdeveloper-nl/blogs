@@ -209,7 +209,7 @@ class TranslatePost extends AbstractAction
         $metaDescription = null;
 
         if($this->model->meta_description) {
-            $description = I18nTranslationService::translate($this->model->meta_description, $target->code);
+            $metaDescription = I18nTranslationService::translate($this->model->meta_description, $target->code);
         }
 
         $metaKeywords = null;
