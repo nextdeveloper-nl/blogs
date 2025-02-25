@@ -237,8 +237,12 @@ class TranslatePost extends AbstractAction
         );
 
         //  Add tags
-        $tags = I18nTranslationService::translate(implode(',', $this->model->tags), $target->code);
+        $tags = $this->model->tags;
 
+        foreach ($tags as &$tag)
+            $tag = str_replace('"', '', $tag);
+
+        $tags = I18nTranslationService::translate(implode(',', $tags), $target->code);
         $translatedContent['tags'] = explode(',', $tags->translation);
 
         // Replace manual field assignments with:
