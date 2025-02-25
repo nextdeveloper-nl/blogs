@@ -54,7 +54,6 @@ trait TranslatablePostHelper
             'is_pinned'         => $this->model->is_pinned,
             'is_draft'          => $this->model->is_draft,
             'is_markdown'       => $this->model->is_markdown,
-            'common_domain_id'  => $this->model->common_domain_id,
             'common_category_id'=> $this->model->common_category_id,
             'created_at'        => $this->model->created_at,
             'updated_at'        => $this->model->updated_at
