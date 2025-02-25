@@ -5,6 +5,8 @@ namespace NextDeveloper\Blogs\Services;
 use Illuminate\Support\Str;
 use NextDeveloper\Blogs\Database\Filters\PostsQueryFilter;
 use NextDeveloper\Blogs\Database\Models\Accounts;
+use NextDeveloper\Blogs\Database\Models\Posts;
+use NextDeveloper\Blogs\Database\Models\PostsPerspective;
 use NextDeveloper\Blogs\Services\AbstractServices\AbstractPostsService;
 use NextDeveloper\IAM\Database\Scopes\AuthorizationScope;
 
@@ -53,5 +55,38 @@ class PostsService extends AbstractPostsService
         $data['blog_account_id'] = $account->id;
 
         return parent::create($data);
+    }
+
+    public static function getAlternates(Posts|PostsPerspective $post) : array
+    {
+        $alternates = $post->alternates;
+
+        if($alternates) {
+            $alternates[] = [
+                'locale'    => $post->locale,
+                'slug'  => $post->slug
+            ];
+
+            return $alternates;
+        }
+
+        //  If the blog itself is the alternate of another blog, we need to get the alternates of the parent blog
+
+        $alternateOf = $post->alternate_of;
+
+        if($alternateOf) {
+            $parentBlog = Posts::withoutGlobalScope(AuthorizationScope::class)
+                ->where('id', $alternateOf)
+                ->first();
+
+            $alternates = $parentBlog->alternates;
+
+            $alternates[] = [
+                'locale' => $parentBlog->locale,
+                'slug' => $parentBlog->slug
+            ];
+        }
+
+        return $alternates;
     }
 }

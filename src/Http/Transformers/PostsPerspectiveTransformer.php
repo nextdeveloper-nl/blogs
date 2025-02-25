@@ -3,6 +3,7 @@
 namespace NextDeveloper\Blogs\Http\Transformers;
 
 use Illuminate\Support\Facades\Cache;
+use NextDeveloper\Blogs\Services\PostsService;
 use NextDeveloper\Commons\Common\Cache\CacheHelper;
 use NextDeveloper\Blogs\Database\Models\PostsPerspective;
 use NextDeveloper\Commons\Http\Transformers\AbstractTransformer;
@@ -28,10 +29,12 @@ class PostsPerspectiveTransformer extends AbstractPostsPerspectiveTransformer
         );
 
         if($transformed) {
-//            return $transformed;
+            return $transformed;
         }
 
         $transformed = parent::transform($model);
+
+        $transformed['alternate_posts'] = PostsService::getAlternates($model);
 
         Cache::set(
             CacheHelper::getKey('PostsPerspective', $model->uuid, 'Transformed'),
