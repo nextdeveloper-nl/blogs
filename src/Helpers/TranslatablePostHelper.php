@@ -44,7 +44,6 @@ trait TranslatablePostHelper
     protected function getCommonFields(): array
     {
         return [
-            'tags'              => $this->model->tags,
             'iam_account_id'    => $this->model->iam_account_id,
             'iam_user_id'       => $this->model->iam_user_id,
             'abstract'           => $this->model->abstract,
