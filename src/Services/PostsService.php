@@ -4,7 +4,9 @@ namespace NextDeveloper\Blogs\Services;
 
 use Illuminate\Support\Str;
 use NextDeveloper\Blogs\Database\Filters\PostsQueryFilter;
+use NextDeveloper\Blogs\Database\Models\Accounts;
 use NextDeveloper\Blogs\Services\AbstractServices\AbstractPostsService;
+use NextDeveloper\IAM\Database\Scopes\AuthorizationScope;
 
 /**
  * This class is responsible from managing the data for Posts
@@ -43,6 +45,12 @@ class PostsService extends AbstractPostsService
             foreach ($data['tags'] as &$tag)
                 $tag = Str::replace(',', '', $tag);
         }
+
+        $account = Accounts::withoutGlobalScope(AuthorizationScope::class)
+            ->where('common_domain_id', $data['common_domain_id'])
+            ->first();
+
+        $data['blog_account_id'] = $account->id;
 
         return parent::create($data);
     }
