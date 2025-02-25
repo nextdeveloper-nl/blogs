@@ -227,7 +227,7 @@ class TranslatePost extends AbstractAction
         $translatedContent = array_merge($translatedContent, [
             'meta_title'    =>  $metaTitle ? $metaTitle->translation : $translatedContent['title'],
             'meta_description'  =>   $metaDescription ? $metaDescription->translation : $this->model->meta_description,
-            'meta_keywords'  =>   $metaKeywords ? $metaKeywords->translation : $this->model->meta_keywords
+            'meta_keywords'  =>   $metaKeywords ? $metaKeywords->translation : $this->model->meta_keywords,
         ]);
 
         // add slug
@@ -235,6 +235,11 @@ class TranslatePost extends AbstractAction
             $translatedContent['title'] ?? $this->model->title,
             Posts::class
         );
+
+        //  Add tags
+        $tags = I18nTranslationService::translate(implode(',', $this->model->tags), $target->code);
+
+        $translatedContent['tags'] = explode(',', $tags);
 
         // Replace manual field assignments with:
         $translatedContent = array_merge(
