@@ -65,6 +65,7 @@ class PostsService extends AbstractPostsService
             $alternates[] = [
                 'uuid'  =>  $post->uuid,
                 'locale'    => $post->locale,
+                'title' => $post->title,
                 'slug'  => $post->slug
             ];
 
@@ -85,6 +86,7 @@ class PostsService extends AbstractPostsService
             $alternates[] = [
                 'uuid'  => $parentBlog->uuid,
                 'locale' => $parentBlog->locale,
+                'title' => $parentBlog->title,
                 'slug' => $parentBlog->slug
             ];
         }
