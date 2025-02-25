@@ -63,6 +63,7 @@ class PostsService extends AbstractPostsService
 
         if($alternates) {
             $alternates[] = [
+                'uuid'  =>  $post->uuid,
                 'locale'    => $post->locale,
                 'slug'  => $post->slug
             ];
@@ -82,6 +83,7 @@ class PostsService extends AbstractPostsService
             $alternates = $parentBlog->alternates;
 
             $alternates[] = [
+                'uuid'  => $parentBlog->uuid,
                 'locale' => $parentBlog->locale,
                 'slug' => $parentBlog->slug
             ];

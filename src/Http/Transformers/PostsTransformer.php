@@ -4,6 +4,7 @@ namespace NextDeveloper\Blogs\Http\Transformers;
 
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\ParamBag;
+use NextDeveloper\Blogs\Services\PostsService;
 use NextDeveloper\Commons\Common\Cache\CacheHelper;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Commons\Http\Transformers\AbstractTransformer;
@@ -50,6 +51,8 @@ class PostsTransformer extends AbstractPostsTransformer
         }
 
         $transformed = parent::transform($model);
+
+        $transformed['alternate_posts'] = PostsService::getAlternates($model);
 
         Cache::set(
             CacheHelper::getKey('Posts', $model->uuid, 'Transformed'),
