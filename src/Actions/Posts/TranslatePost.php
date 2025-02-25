@@ -244,6 +244,7 @@ class TranslatePost extends AbstractAction
                 'alternate_of' => $this->model->id,
                 'locale' => trim($target->code),
                 'slug' => $translatedContent['slug'],
+                'common_domain_id'  =>  $destinationAccount->common_domain_id,
                 'blog_account_id'   =>  $destinationAccount->id
             ]
         );
