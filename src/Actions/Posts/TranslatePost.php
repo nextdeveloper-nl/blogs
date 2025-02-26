@@ -230,6 +230,12 @@ class TranslatePost extends AbstractAction
             'meta_keywords'  =>   $metaKeywords ? $metaKeywords->translation : $this->model->meta_keywords,
         ]);
 
+        //  Translatinf abstract
+        if($this->model->abstract) {
+            $abstract = I18nTranslationService::translate($this->model->abstract, $target->code);
+            $translatedContent['abstract'] = $abstract->translation;
+        }
+
         // add slug
         $translatedContent['slug'] = SlugHelper::generate(
             $translatedContent['title'] ?? $this->model->title,
@@ -258,6 +264,14 @@ class TranslatePost extends AbstractAction
             ]
         );
 
+        //  Last check before create
+        $alternate = Posts::where('alternate_of', $lockedPost->id)
+            ->where('blog_account_id', $destinationAccount->id)
+            ->first();
+
+        if($alternate)
+            return;
+
         $translatedPost = Posts::forceCreateQuietly($translatedContent);
 
         if (!$translatedPost) {
@@ -275,7 +289,6 @@ class TranslatePost extends AbstractAction
         $lockedPost->alternates = $this->cleanAlternates(
             array_merge($alternates, [$newAlternate])
         );
-
 
         $lockedPost->saveQuietly();
     }

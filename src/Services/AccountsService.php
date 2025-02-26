@@ -26,4 +26,19 @@ class AccountsService extends AbstractAccountsService
             ->where('is_auto_translate_enabled', true)
             ->first();
     }
+
+    public static function getAlternates(Accounts $accounts)
+    {
+        $alternates = $accounts->alternate['blog_account_ids'];
+
+        $accounts = [];
+
+        foreach ($alternates as $alternate) {
+            $accounts[] = Accounts::withoutGlobalScope(AuthorizationScope::class)
+                ->where('id', $alternate)
+                ->first();
+        }
+
+        return $accounts;
+    }
 }
