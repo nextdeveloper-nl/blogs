@@ -230,6 +230,12 @@ class TranslatePost extends AbstractAction
             'meta_keywords'  =>   $metaKeywords ? $metaKeywords->translation : $this->model->meta_keywords,
         ]);
 
+        //  Translatinf abstract
+        if($this->model->abstract) {
+            $abstract = I18nTranslationService::translate($this->model->abstract, $target->code);
+            $translatedContent['abstract'] = $abstract->translation;
+        }
+
         // add slug
         $translatedContent['slug'] = SlugHelper::generate(
             $translatedContent['title'] ?? $this->model->title,
