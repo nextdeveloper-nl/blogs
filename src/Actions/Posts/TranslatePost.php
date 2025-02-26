@@ -264,6 +264,14 @@ class TranslatePost extends AbstractAction
             ]
         );
 
+        //  Last check before create
+        $alternate = Posts::where('alternate_of', $lockedPost->id)
+            ->where('blog_account_id', $destinationAccount->id)
+            ->first();
+
+        if($alternate)
+            return;
+
         $translatedPost = Posts::forceCreateQuietly($translatedContent);
 
         if (!$translatedPost) {
@@ -281,7 +289,6 @@ class TranslatePost extends AbstractAction
         $lockedPost->alternates = $this->cleanAlternates(
             array_merge($alternates, [$newAlternate])
         );
-
 
         $lockedPost->saveQuietly();
     }

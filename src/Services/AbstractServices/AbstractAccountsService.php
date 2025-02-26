@@ -186,7 +186,7 @@ class AbstractAccountsService
                 $data['common_language_id']
             );
         }
-                        
+
         try {
             $model = Accounts::create($data);
         } catch(\Exception $e) {
@@ -246,7 +246,7 @@ class AbstractAccountsService
                 $data['common_language_id']
             );
         }
-    
+
         Events::fire('updating:NextDeveloper\Blogs\Accounts', $model);
 
         try {
