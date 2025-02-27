@@ -8,6 +8,8 @@ use NextDeveloper\Blogs\Database\Models\Accounts;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Blogs\Database\Models\PostsPerspective;
 use NextDeveloper\Blogs\Services\AbstractServices\AbstractPostsService;
+use NextDeveloper\Commons\Database\Models\Domains;
+use NextDeveloper\Commons\Services\DomainsService;
 use NextDeveloper\IAM\Database\Scopes\AuthorizationScope;
 
 /**
@@ -48,8 +50,12 @@ class PostsService extends AbstractPostsService
                 $tag = Str::replace(',', '', $tag);
         }
 
+        $domain = Domains::withoutGlobalScope(AuthorizationScope::class)
+            ->where('uuid', $data['common_domain_id'])
+            ->first();
+
         $account = Accounts::withoutGlobalScope(AuthorizationScope::class)
-            ->where('common_domain_id', $data['common_domain_id'])
+            ->where('common_domain_id', $domain->id)
             ->first();
 
         $data['blog_account_id'] = $account->id;
