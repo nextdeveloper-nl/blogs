@@ -4,12 +4,11 @@ namespace NextDeveloper\Blogs\Services;
 
 use Illuminate\Support\Str;
 use NextDeveloper\Blogs\Database\Filters\PostsQueryFilter;
-use NextDeveloper\Blogs\Database\Models\Accounts;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Blogs\Database\Models\PostsPerspective;
 use NextDeveloper\Blogs\Services\AbstractServices\AbstractPostsService;
+use NextDeveloper\Blogs\Database\Models\Accounts;
 use NextDeveloper\Commons\Database\Models\Domains;
-use NextDeveloper\Commons\Services\DomainsService;
 use NextDeveloper\IAM\Database\Scopes\AuthorizationScope;
 
 /**
@@ -21,7 +20,6 @@ use NextDeveloper\IAM\Database\Scopes\AuthorizationScope;
  */
 class PostsService extends AbstractPostsService
 {
-
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
     /**
