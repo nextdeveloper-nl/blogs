@@ -282,6 +282,7 @@ class TranslatePost extends AbstractAction
         $newAlternate = [
             'id' => $translatedPost->id,
             'locale' => trim($target->code),
+            'title' =>  $translatedPost->title,
             'slug' => $translatedPost->slug
         ];
 

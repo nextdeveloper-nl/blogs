@@ -2,6 +2,7 @@
 
 namespace NextDeveloper\Blogs\Services;
 
+use Google\Service\Blogger\Post;
 use Illuminate\Support\Str;
 use NextDeveloper\Blogs\Database\Filters\PostsQueryFilter;
 use NextDeveloper\Blogs\Database\Models\Posts;
@@ -61,40 +62,69 @@ class PostsService extends AbstractPostsService
         return parent::create($data);
     }
 
+    /**
+     * A post can either have alternates, or a parent blog that has alternates. Therefore we first need to
+     * look at alternates. If the alternates are empty, then we go to alternateOf and build the alternates
+     * information
+     *
+     * @param Posts|PostsPerspective $post
+     * @return array
+     */
     public static function getAlternates(Posts|PostsPerspective $post) : array
     {
         $alternates = $post->alternates;
 
-        if($alternates) {
-            $alternates[] = [
-                'uuid'  =>  $post->uuid,
-                'locale'    => $post->locale,
-                'title' => $post->title,
-                'slug'  => $post->slug
-            ];
+        if(!$alternates)
+            $alternates = self::getParentAlternates($post);
 
-            return $alternates;
-        }
+        $alternatedPosts = [];
 
-        //  If the blog itself is the alternate of another blog, we need to get the alternates of the parent blog
+        $parentBlog = self::getParentBlog($post);
 
-        $alternateOf = $post->alternate_of;
+        if(!$parentBlog)
+            return [];
 
-        if($alternateOf) {
-            $parentBlog = Posts::withoutGlobalScope(AuthorizationScope::class)
-                ->where('id', $alternateOf)
+        $alternatedPosts[] = [
+            'uuid'  => $parentBlog->uuid,
+            'locale' => $parentBlog->locale,
+            'title' => $parentBlog->title,
+            'slug' => $parentBlog->slug
+        ];
+
+        foreach ($alternates as $alternate) {
+            $alternatePost = Posts::withoutGlobalScope(AuthorizationScope::class)
+                ->where('slug', $alternate['slug'])
                 ->first();
 
-            $alternates = $parentBlog->alternates;
-
-            $alternates[] = [
-                'uuid'  => $parentBlog->uuid,
-                'locale' => $parentBlog->locale,
-                'title' => $parentBlog->title,
-                'slug' => $parentBlog->slug
+            $alternatedPosts[] = [
+                'uuid'  => $alternatePost->uuid,
+                'locale' => $alternatePost->locale,
+                'title' => $alternatePost->title,
+                'slug' => $alternatePost->slug
             ];
         }
 
-        return $alternates;
+        return $alternatedPosts;
     }
+
+    public static function getParentBlog(Posts|PostsPerspective $post) : ?Posts
+    {
+        return Posts::withoutGlobalScope(AuthorizationScope::class)
+            ->where('id', $post->alternate_of)
+            ->first();
+    }
+
+    public static function getParentAlternates(Posts|PostsPerspective $post) : array
+    {
+        $parentBlog = Posts::withoutGlobalScope(AuthorizationScope::class)
+            ->where('id', $post->alternate_of)
+            ->first();
+
+        if($parentBlog) {
+            return $parentBlog->alternates;
+        }
+
+        return [];
+    }
+
 }
