@@ -96,6 +96,9 @@ class PostsService extends AbstractPostsService
                 ->where('slug', $alternate['slug'])
                 ->first();
 
+            if(!$alternatePost)
+                continue;
+
             $alternatedPosts[] = [
                 'uuid'  => $alternatePost->uuid,
                 'locale' => $alternatePost->locale,
