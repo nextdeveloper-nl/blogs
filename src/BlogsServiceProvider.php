@@ -5,7 +5,7 @@ namespace NextDeveloper\Blogs;
 use Illuminate\Support\Facades\Auth;
 use NextDeveloper\Commons\AbstractServiceProvider;
 use NextDeveloper\IAM\Auth\Providers\IamUserProvider;
-
+use Illuminate\Console\Scheduling\Schedule;
 /**
  * Class IAMServiceProvider
  *
@@ -27,13 +27,14 @@ class BlogsServiceProvider extends AbstractServiceProvider {
             __DIR__.'/../config/blogs.php' => config_path('blogs.php'),
         ], 'config');
 
-        $this->loadViewsFrom($this->dir.'/../resources/views', 'Blogs');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'Blogs');
 
 //        $this->bootErrorHandler();
         $this->bootGuard();
         $this->bootChannelRoutes();
         $this->bootModelBindings();
         $this->bootLogger();
+        $this->bootSchedule();
     }
 
     public function bootGuard() {
@@ -106,7 +107,7 @@ class BlogsServiceProvider extends AbstractServiceProvider {
     protected function registerCommands() {
         if ($this->app->runningInConsole()) {
             $this->commands([
-
+                \NextDeveloper\Blogs\Console\Commands\DailyDigestCommand::class,
             ]);
         }
     }
@@ -129,4 +130,12 @@ class BlogsServiceProvider extends AbstractServiceProvider {
         return $isSuccessfull;
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+    private function bootSchedule() {
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->command('blogs:daily-digest')
+                ->daily();
+        });
+    }
 }
