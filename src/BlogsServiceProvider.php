@@ -131,11 +131,5 @@ class BlogsServiceProvider extends AbstractServiceProvider {
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
-    private function bootSchedule() {
-        $this->app->booted(function () {
-            $schedule = $this->app->make(Schedule::class);
-            $schedule->command('blogs:daily-digest')
-                ->daily();
-        });
-    }
+    private function bootSchedule() {}
 }
