@@ -34,7 +34,6 @@ class BlogsServiceProvider extends AbstractServiceProvider {
         $this->bootChannelRoutes();
         $this->bootModelBindings();
         $this->bootLogger();
-        $this->bootSchedule();
     }
 
     public function bootGuard() {
