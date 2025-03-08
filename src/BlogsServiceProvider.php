@@ -110,24 +110,7 @@ class BlogsServiceProvider extends AbstractServiceProvider {
             ]);
         }
     }
-
-    /**
-     * This is here, in case of shit happens!
-     * @return void
-     */
-    private function checkDatabaseConnection() {
-        $isSuccessfull = false;
-
-        try {
-            \DB::connection()->getPdo();
-
-            $isSuccessfull = true;
-        } catch (\Exception $e) {
-            die('Could not connect to the database. Please check your configuration. error:'.$e);
-        }
-
-        return $isSuccessfull;
-    }
+    
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
     private function bootSchedule() {}
