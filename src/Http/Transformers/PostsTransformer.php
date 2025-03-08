@@ -53,6 +53,7 @@ class PostsTransformer extends AbstractPostsTransformer
         $transformed = parent::transform($model);
 
         $transformed['alternate_posts'] = PostsService::getAlternates($model);
+        unset($transformed['alternates']);
 
         Cache::set(
             CacheHelper::getKey('Posts', $model->uuid, 'Transformed'),

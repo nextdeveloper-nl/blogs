@@ -35,6 +35,7 @@ class PostsPerspectiveTransformer extends AbstractPostsPerspectiveTransformer
         $transformed = parent::transform($model);
 
         $transformed['alternate_posts'] = PostsService::getAlternates($model);
+        unset($transformed['alternates']);
 
         Cache::set(
             CacheHelper::getKey('PostsPerspective', $model->uuid, 'Transformed'),
