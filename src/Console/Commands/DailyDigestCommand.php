@@ -24,13 +24,12 @@ class DailyDigestCommand extends Command
     public function __construct()
     {
         parent::__construct();
-
-        UserHelper::setUserById(config('leo.current_user_id'));
-        UserHelper::setCurrentAccountById(config('leo.current_account_id'));
     }
 
     public function handle(): void
     {
+        UserHelper::setAdminAsCurrentUser();
+
         try {
             $this->info('Fetching latest posts...');
 

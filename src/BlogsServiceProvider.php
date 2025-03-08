@@ -110,7 +110,7 @@ class BlogsServiceProvider extends AbstractServiceProvider {
             ]);
         }
     }
-    
+
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
     private function bootSchedule() {}
