@@ -3,9 +3,9 @@
 namespace NextDeveloper\Blogs\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Blogs\Envelopes\DailyDigestNotification;
-use NextDeveloper\Communication\Helpers\Communicate;
 use NextDeveloper\IAM\Database\Models\Users;
 use NextDeveloper\Communication\Services\EmailsService;
 use NextDeveloper\IAM\Helpers\UserHelper;
@@ -97,7 +97,7 @@ class DailyDigestCommand extends Command
 
                                 $this->info('Digest sent to user: ' . $user->email);
                             } catch (\Exception $e) {
-                                \Log::error('Failed to send digest to user: ' . $user->email, [
+                                Log::error('Failed to send digest to user: ' . $user->email, [
                                     'error' => $e->getMessage(),
                                     'user_id' => $user->id
                                 ]);
@@ -107,7 +107,7 @@ class DailyDigestCommand extends Command
                         $processedUsers += $users->count();
                         $this->info("Processed {$processedUsers} users...");
                     } catch (\Exception $e) {
-                        \Log::error('Failed to process user chunk', [
+                        Log::error('Failed to process user chunk', [
                             'error' => $e->getMessage()
                         ]);
                     }
@@ -116,7 +116,7 @@ class DailyDigestCommand extends Command
             $this->info("Daily digest sent successfully to {$processedUsers} users");
         } catch (\Exception $e) {
             $this->error('Failed to send daily digest: ' . $e->getMessage());
-            \Log::error('Daily digest command failed', [
+            Log::error('Daily digest command failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);

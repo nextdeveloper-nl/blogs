@@ -29,11 +29,8 @@ class BlogsServiceProvider extends AbstractServiceProvider {
 
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'Blogs');
 
-//        $this->bootErrorHandler();
         $this->bootGuard();
         $this->bootChannelRoutes();
-        $this->bootModelBindings();
-        $this->bootLogger();
     }
 
     public function bootGuard() {
@@ -45,22 +42,11 @@ class BlogsServiceProvider extends AbstractServiceProvider {
      */
     public function register() {
         $this->registerHelpers();
-        $this->registerMiddlewares('generator');
         $this->registerRoutes();
         $this->registerCommands();
 
         $this->mergeConfigFrom(__DIR__.'/../config/blogs.php', 'blogs');
         $this->customMergeConfigFrom(__DIR__.'/../config/relation.php', 'relation');
-    }
-
-    /**
-     * @return void
-     */
-    public function bootLogger() {
-//        $monolog = Log::getMonolog();
-//        $monolog->pushProcessor(new \Monolog\Processor\WebProcessor());
-//        $monolog->pushProcessor(new \Monolog\Processor\MemoryUsageProcessor());
-//        $monolog->pushProcessor(new \Monolog\Processor\MemoryPeakUsageProcessor());
     }
 
     /**
@@ -70,12 +56,6 @@ class BlogsServiceProvider extends AbstractServiceProvider {
         return ['blogs'];
     }
 
-//    public function bootErrorHandler() {
-//        $this->app->singleton(
-//            ExceptionHandler::class,
-//            Handler::class
-//        );
-//    }
 
     /**
      * @return void
@@ -103,13 +83,7 @@ class BlogsServiceProvider extends AbstractServiceProvider {
      * Registers module based commands
      * @return void
      */
-    protected function registerCommands() {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                \NextDeveloper\Blogs\Console\Commands\DailyDigestCommand::class,
-            ]);
-        }
-    }
+    protected function registerCommands() {}
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
