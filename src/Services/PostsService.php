@@ -81,15 +81,24 @@ class PostsService extends AbstractPostsService
 
         $parentBlog = self::getParentBlog($post);
 
-        if(!$parentBlog)
+        if(!$parentBlog && !$alternates)
             return [];
 
-        $alternatedPosts[] = [
-            'uuid'  => $parentBlog->uuid,
-            'locale' => $parentBlog->locale,
-            'title' => $parentBlog->title,
-            'slug' => $parentBlog->slug
-        ];
+        if($parentBlog) {
+            $alternatedPosts[] = [
+                'uuid'  => $parentBlog->uuid,
+                'locale' => $parentBlog->locale,
+                'title' => $parentBlog->title,
+                'slug' => $parentBlog->slug
+            ];
+        } else {
+            $alternatedPosts[] = [
+                'uuid'  => $post->uuid,
+                'locale' => $post->locale,
+                'title' => $post->title,
+                'slug' => $post->slug
+            ];
+        }
 
         foreach ($alternates as $alternate) {
             $alternatePost = Posts::withoutGlobalScope(AuthorizationScope::class)
