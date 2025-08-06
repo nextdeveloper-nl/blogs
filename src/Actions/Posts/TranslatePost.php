@@ -84,7 +84,15 @@ class TranslatePost extends AbstractAction
 
             foreach ($blogAccount->alternate['blog_account_ids'] as $alternate) {
                 $destinationAccount = AccountsService::getById($alternate);
+                if (!$destinationAccount) {
+                    $this->setProgress(25,"Cannot find a destination account with ID {$alternate} for translation. Please check the blog account alternates.");
+                    continue;
+                }
                 $targetLanguage = self::getTranslationTarget($destinationAccount->common_language_id);
+                if (!$targetLanguage) {
+                    $this->setProgress(25,"Cannot find a target language for account ID {$destinationAccount->id}. Please check the common language ID.");
+                    continue;
+                }
                 $this->setProgress(30, 'Translating to: ' . $targetLanguage->code);
 
                 $this->createTranslation($targetLanguage,  $destinationAccount);
