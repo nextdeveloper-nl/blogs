@@ -53,6 +53,8 @@ class BlogAuthorRole extends AbstractRole implements IAuthorizationRole
             'blog_posts:update',
             'blog_posts:create',
             'blog_posts:delete',
+
+            'blogs_posts_perspective:read',
         ];
     }
 
