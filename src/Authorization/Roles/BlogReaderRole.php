@@ -56,7 +56,9 @@ class BlogReaderRole extends AbstractRole implements IAuthorizationRole
             'blog_posts:like',
             'blog_posts:dislike',
             'blog_posts:report',
-            'blog_posts:share'
+            'blog_posts:share',
+
+            'blogs_posts_perspective:read',
         ];
     }
 
