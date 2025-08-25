@@ -51,14 +51,14 @@ class BlogReaderRole extends AbstractRole implements IAuthorizationRole
     public function allowedOperations() :array
     {
         return [
-            'blogs_posts:read',
-            'blogs_posts:comment',
-            'blogs_posts:like',
-            'blogs_posts:dislike',
-            'blogs_posts:report',
-            'blogs_posts:share',
+            'blog_posts:read',
+            'blog_posts:comment',
+            'blog_posts:like',
+            'blog_posts:dislike',
+            'blog_posts:report',
+            'blog_posts:share',
 
-            'blogs_posts_perspective:read',
+            'blog_posts_perspective:read',
         ];
     }
 

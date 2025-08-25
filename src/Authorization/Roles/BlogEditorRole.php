@@ -48,12 +48,12 @@ class BlogEditorRole extends AbstractRole implements IAuthorizationRole
     public function allowedOperations() :array
     {
         return [
-            'blogs_posts:read',
-            'blogs_posts:update',
-            'blogs_posts:create',
-            'blogs_posts:delete',
+            'blog_posts:read',
+            'blog_posts:update',
+            'blog_posts:create',
+            'blog_posts:delete',
 
-            'blogs_posts_perspective:read',
+            'blog_posts_perspective:read',
         ];
     }
 
