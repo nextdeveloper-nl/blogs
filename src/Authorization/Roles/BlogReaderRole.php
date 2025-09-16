@@ -94,9 +94,4 @@ class BlogReaderRole extends AbstractRole implements IAuthorizationRole
     {
         return self::DB_PREFIX;
     }
-
-    public function checkRules(Users $users): bool
-    {
-        // TODO: Implement checkRules() method.
-    }
 }

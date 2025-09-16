@@ -66,21 +66,19 @@ class TranslateAllPosts extends AbstractAction
         $posts = Posts::withoutGlobalScope(AuthorizationScope::class)
             ->withoutGlobalScope(LimitScope::class)
             ->where('blog_account_id', $this->model->id)
+            ->where('is_draft', false)
+            ->whereNull('alternate_of')
+            ->orderBy('id', 'desc')
             ->get();
 
         $alternates = AccountsService::getAlternates($this->model);
 
-        foreach ($posts as $post) {
-            foreach ($alternates as $alternate) {
-                $alternatePost = Posts::withoutGlobalScope(AuthorizationScope::class)
-                    ->where('blog_account_id', $alternate->id)
-                    ->where('alternate_of', $post->id)
-                    ->first();
+        Log::info('[TranslateAllPosts] Translating ' . $posts->count() . ' posts for account ' . $this->model->id . ' to ' . implode(', ', $alternates) . ' alternates');
 
-                if(!$alternatePost) {
-                    dispatch(new TranslatePost($post));
-                }
-            }
+        foreach ($posts as $post) {
+            Log::info('[TranslateAllPosts] Translating post ' . $post->id . ', ' . $post->title . ' for account ' . $this->model->id);
+
+            dispatch(new TranslatePost($post));
         }
 
         $this->setFinished('Translation trigger is finished');
