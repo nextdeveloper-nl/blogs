@@ -52,6 +52,7 @@ class BlogAdminRole extends AbstractRole implements IAuthorizationRole
             'blog_posts:delete',
 
             'blog_posts_perspective:read',
+            'blog_accounts_perspective:read',
         ];
     }
 
@@ -86,10 +87,5 @@ class BlogAdminRole extends AbstractRole implements IAuthorizationRole
     public function getDbPrefix()
     {
         return self::DB_PREFIX;
-    }
-
-    public function checkRules(Users $users): bool
-    {
-        // TODO: Implement checkRules() method.
     }
 }
