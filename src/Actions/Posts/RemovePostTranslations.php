@@ -14,8 +14,6 @@ use NextDeveloper\IAM\Helpers\UserHelper;
 /**
  * Class RemovePostTranslations
  * This class is responsible for removing all translations of a post and keeping only the original.
- *
- * @package NextDeveloper\Blogs\Actions\Posts
  */
 class RemovePostTranslations extends AbstractAction
 {

@@ -84,7 +84,6 @@ class TranslatePost extends AbstractAction
             $this->setProgress(20, 'Alternates decoded ...');
 
             foreach ($blogAccount->alternate['blog_account_ids'] as $alternate) {
-
                 $destinationAccount = AccountsService::getById($alternate);
 
                 if (!$destinationAccount) {
@@ -210,6 +209,7 @@ class TranslatePost extends AbstractAction
          */
         $title = I18nTranslationService::translate($this->model->title, $target->code);
         $body = I18nTranslationService::translate($this->model->body, $target->code);
+        $abstract = I18nTranslationService::translate($this->model->abstract, $target->code);
 
         $metaTitle = null;
 
@@ -236,6 +236,7 @@ class TranslatePost extends AbstractAction
         $translatedContent = [
             'title' =>  $title ? $title->translation : $this->model->title,
             'body'  =>  $body ? $body->translation : $this->model->body,
+            'abstract'  =>  $abstract ? $abstract->transtion: $this->model->abstract
         ];
 
         $translatedContent = array_merge($translatedContent, [
@@ -244,7 +245,7 @@ class TranslatePost extends AbstractAction
             'meta_keywords'  =>   $metaKeywords ? $metaKeywords->translation : $this->model->meta_keywords,
         ]);
 
-        //  Translatinf abstract
+        //  Translating abstract
         if($this->model->abstract) {
             $abstract = I18nTranslationService::translate($this->model->abstract, $target->code);
             $translatedContent['abstract'] = $abstract->translation;
