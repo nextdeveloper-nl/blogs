@@ -9,25 +9,21 @@ use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Blogs\Helpers\TranslatablePostHelper;
 use NextDeveloper\Commons\Actions\AbstractAction;
 use NextDeveloper\Commons\Exceptions\NotAllowedException;
-use NextDeveloper\Commons\Helpers\SlugHelper;
 use NextDeveloper\IAM\Helpers\UserHelper;
+use Throwable;
 
 /**
- * Class UpdatePostTranslations
- * This class is responsible for updating the translations of a post.
- *
- * @package NextDeveloper\Blogs\Actions\Posts
+ * Re-translates and updates every alternate attached to a post whenever the
+ * source post itself is updated. Each alternate is handled in its own
+ * transaction so that a failure on one locale does not corrupt the others.
  */
 class UpdatePostTranslations extends AbstractAction
 {
     use TranslatablePostHelper;
 
-
     public const EVENTS = [
         'updated:NextDeveloper\Blogs\Posts',
     ];
-
-    // Constructor to initialize the Posts model
 
     /**
      * @throws NotAllowedException
@@ -43,120 +39,207 @@ class UpdatePostTranslations extends AbstractAction
     }
 
     /**
-     * Main handler function to process post updates.
-     *
-     * @throws Exception|\Throwable
+     * @throws Exception|Throwable
      */
     public function handle(): void
     {
-        $this->setProgress(0, 'Initiating post translation ...');
-
-        if ($this->shouldSkipProcessing()) {
-
-            $this->setFinished('Post is a draft or is an alternate of another post, please and try again.');
-            return;
-        }
-
-        DB::beginTransaction();
+        $this->setProgress(0, 'Initiating post translation update ...');
 
         try {
+            if ($this->shouldSkipProcessing()) {
+                $this->setFinished('Post is a draft, an alternate, or has no translations to update.');
 
-            // set progress
-            $this->setProgress(0, 'Translating post alternates ...');
+                return;
+            }
 
-            // Decode and clean alternates
-            $alternates = $this->decodeAlternates($this->model->alternates);
-            // 10% progress
+            $alternates = $this->normalizeAlternates($this->model->alternates);
             $this->setProgress(10, 'Alternates decoded ...');
 
-            // Validate alternates against the database
-            $validAlternates = $this->validateAlternatesAgainstDB($alternates);
-            // 20% progress
+            $validAlternates = $this->filterValidAlternates($alternates);
             $this->setProgress(20, 'Alternates validated ...');
 
-            // Process translations for valid alternates
-            $this->processTranslations($validAlternates);
-            // 80% progress
-            $this->setProgress(80, 'Translations processed ...');
+            if (empty($validAlternates)) {
+                $this->setFinished('No valid alternates found to update.');
 
-            // Update model with valid alternates
-            $this->updateModelAlternates($validAlternates);
-            // 90% progress
+                return;
+            }
 
-            DB::commit();
-            // 100% progress
+            $this->updateAlternates($validAlternates);
+
+            $this->syncAlternatesColumn($validAlternates);
+
+            $this->setProgress(100, 'Post alternates updated successfully.');
             $this->setFinished('Post alternates updated successfully.');
         } catch (Exception $e) {
-            DB::rollBack();
             $this->handleTranslationError($e);
         }
     }
 
-    /**
-     * Determines if processing should be skipped based on model state.
-     */
     private function shouldSkipProcessing(): bool
     {
-        return $this->model->is_draft ||
-               $this->model->alternate_of ||
-               empty($this->model->alternates);
+        return $this->model->is_draft
+            || $this->model->alternate_of
+            || empty($this->model->alternates);
     }
 
     /**
-     * Validates alternates against the database to ensure they exist.
+     * Drops any alternate rows that no longer exist in the database.
      *
-     * @param array $alternates
-     * @return array
+     * @param  array<int, array<string, mixed>>  $alternates
+     * @return array<int, array<string, mixed>>
      */
-    private function validateAlternatesAgainstDB(array $alternates): array
+    private function filterValidAlternates(array $alternates): array
     {
-        $validAlternates = [];
-        foreach ($alternates as $alt) {
+        $valid = [];
+
+        foreach ($alternates as $alternate) {
+            if (empty($alternate['id']) || empty($alternate['locale'])) {
+                continue;
+            }
+
             $exists = Posts::withoutGlobalScopes()
-            ->where('id', $alt['id'])
-            ->where('locale', $alt['locale'])
-            ->exists();
+                ->where('id', $alternate['id'])
+                ->where('locale', $alternate['locale'])
+                ->exists();
 
             if ($exists) {
-                $validAlternates[] = $alt;
-            } else {
-                Log::warning('Removing invalid alternate', [
-                    'post_id'   => $this->model->id,
-                    'id'        => $alt['id']
+                $valid[] = $alternate;
+
+                continue;
+            }
+
+            Log::warning('UpdatePostTranslations: dropping stale alternate', [
+                'post_id' => $this->model->id,
+                'alternate_id' => $alternate['id'],
+                'locale' => $alternate['locale'] ?? null,
+            ]);
+        }
+
+        return $valid;
+    }
+
+    /**
+     * Re-translates each alternate, reporting progress and catching per-alternate
+     * failures so a single broken locale cannot block the rest.
+     *
+     * @param  array<int, array<string, mixed>>  $alternates
+     */
+    private function updateAlternates(array $alternates): void
+    {
+        $total = count($alternates);
+        $baseProgress = 20;
+        $range = 70;
+
+        foreach ($alternates as $index => $alternate) {
+            $progress = (int) ($baseProgress + ($range * ($index / max($total, 1))));
+            $this->setProgress($progress, "Updating translation for {$alternate['locale']} ...");
+
+            try {
+                $this->updateTranslation($alternate);
+            } catch (Throwable $e) {
+                Log::error('UpdatePostTranslations: alternate update failed', [
+                    'post_id' => $this->model->id,
+                    'alternate_id' => $alternate['id'] ?? null,
+                    'locale' => $alternate['locale'] ?? null,
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
-        return $validAlternates;
     }
 
     /**
-     * Processes translations for each valid alternate.
+     * Re-translates one alternate post and refreshes its content/slug.
      *
-     * @param array $alternates
-     * @throws \Throwable
+     * @param  array<string, mixed>  $alternate
+     *
+     * @throws Throwable
      */
-    private function processTranslations(array $alternates): void
+    private function updateTranslation(array $alternate): void
     {
-        foreach ($alternates as $alternate) {
-            $this->updateTranslation($alternate);
+        try {
+            $this->validateAlternate($alternate);
+        } catch (\InvalidArgumentException $e) {
+            Log::warning('UpdatePostTranslations: invalid alternate format', [
+                'alternate' => $alternate,
+                'error' => $e->getMessage(),
+            ]);
+
+            return;
         }
+
+        $locale = strtolower(trim($alternate['locale']));
+
+        DB::transaction(function () use ($alternate, $locale): void {
+            $translatedPost = Posts::withoutGlobalScopes()
+                ->where('id', $alternate['id'])
+                ->lockForUpdate()
+                ->first();
+
+            if (! $translatedPost) {
+                Log::warning('UpdatePostTranslations: alternate post vanished', [
+                    'alternate_id' => $alternate['id'],
+                    'locale' => $locale,
+                ]);
+
+                return;
+            }
+
+            $payload = array_merge(
+                $this->buildTranslatedPayload($locale),
+                $this->getCommonFields(),
+                [
+                    'locale' => $locale,
+                    'alternate_of' => $this->model->id,
+                    'blog_account_id' => $translatedPost->blog_account_id,
+                    'common_domain_id' => $translatedPost->common_domain_id,
+                ]
+            );
+
+            $translatedPost->updateQuietly($payload);
+        });
     }
 
     /**
-     * Updates the model's alternates field with valid alternates.
+     * Normalizes the alternates column on the source post so each entry
+     * reflects the latest slug/title of the translated post.
      *
-     * @param array $alternates
+     * @param  array<int, array<string, mixed>>  $alternates
      */
-    private function updateModelAlternates(array $alternates): void
+    private function syncAlternatesColumn(array $alternates): void
     {
-        $this->model->alternates = $this->cleanAlternates($alternates);
+        $ids = array_column($alternates, 'id');
+
+        if (empty($ids)) {
+            return;
+        }
+
+        $fresh = Posts::withoutGlobalScopes()
+            ->whereIn('id', $ids)
+            ->get()
+            ->keyBy('id');
+
+        $updated = [];
+
+        foreach ($alternates as $alternate) {
+            $post = $fresh->get($alternate['id']);
+
+            if (! $post) {
+                continue;
+            }
+
+            $updated[] = [
+                'id' => $post->id,
+                'locale' => strtolower(trim($alternate['locale'])),
+                'title' => $post->title,
+                'slug' => $post->slug,
+            ];
+        }
+
+        $this->model->alternates = $this->cleanAlternates($updated);
         $this->model->saveQuietly();
     }
 
     /**
-     * Handles errors during translation processing.
-     *
-     * @param Exception $e
      * @throws Exception
      */
     private function handleTranslationError(Exception $e): void
@@ -164,92 +247,11 @@ class UpdatePostTranslations extends AbstractAction
         Log::error('Post alternate update failed', [
             'post_id' => $this->model->id,
             'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
+            'trace' => $e->getTraceAsString(),
         ]);
 
-        $this->setFinishedWithError('Post alternate update failed: ' . $e->getMessage());
+        $this->setFinishedWithError('Post alternate update failed: '.$e->getMessage());
 
         throw $e;
-    }
-
-    /**
-     * Decodes alternates from JSON or returns an empty array if invalid.
-     *
-     * @param mixed $alternates
-     * @return array
-     */
-    private function decodeAlternates(mixed $alternates): array
-    {
-        return is_string($alternates)
-            ? json_decode($alternates, true) ?? []
-            : ($alternates ?? []);
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    private function updateTranslation(array $alternate): void
-    {
-        try {
-            $this->validateAlternate($alternate);
-            $alternate['locale'] = strtolower(trim($alternate['locale']));
-        } catch (\InvalidArgumentException $e) {
-            Log::warning('Invalid alternate format', [
-                'alternate' => $alternate,
-                'error' => $e->getMessage()
-            ]);
-            return;
-        }
-
-        $translatedPost = Posts::withoutGlobalScopes()
-            ->find($alternate['id']);
-
-        if (!$translatedPost) {
-            Log::warning('Alternate post not found', [
-                'id' => $alternate['id'],
-                'locale' => $alternate['locale']
-            ]);
-            return;
-        }
-
-        $locale = $alternate['locale'] ?? null;
-
-        if (!$locale) {
-            Log::warning('Alternate missing locale', ['alternate_id' => $alternate['id']]);
-            return;
-        }
-
-        $translatedContent = $this->translateContent($locale);
-
-        $translatedContent['slug'] = SlugHelper::generate($translatedContent['title'], Posts::class);
-
-        $updateData = array_merge(
-            $translatedContent,
-            $this->getCommonFields(),
-            [
-                'locale' => $locale
-            ]
-        );
-
-       $translatedPost->updateQuietly($updateData);
-
-        $originalPost = Posts::find($translatedPost->alternate_of);
-        if ($originalPost) {
-            DB::transaction(function() use ($originalPost, $translatedPost) {
-                $alternates = is_array($originalPost->alternates)
-                    ? $originalPost->alternates
-                    : json_decode($originalPost->alternates ?? '[]', true);
-
-                foreach ($alternates as &$alt) {
-                    if ($alt['id'] == $translatedPost->id) {
-                        $alt['slug'] = $translatedPost->slug;
-                        break;
-                    }
-                }
-
-                $originalPost->alternates = $this->cleanAlternates($alternates);
-                $originalPost->saveQuietly();
-            });
-        }
     }
 }
