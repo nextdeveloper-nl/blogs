@@ -184,8 +184,19 @@ class UpdatePostTranslations extends AbstractAction
                 return;
             }
 
+            $translatedPayload = $this->buildTranslatedPayload($locale);
+
+            if ($translatedPayload['title'] === $this->model->title) {
+                Log::warning('UpdatePostTranslations: translation service returned source text unchanged; skipping locale', [
+                    'post_id' => $this->model->id,
+                    'locale' => $locale,
+                ]);
+
+                return;
+            }
+
             $payload = array_merge(
-                $this->buildTranslatedPayload($locale),
+                $translatedPayload,
                 $this->getCommonFields(),
                 [
                     'locale' => $locale,

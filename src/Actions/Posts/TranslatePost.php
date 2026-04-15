@@ -177,8 +177,19 @@ class TranslatePost extends AbstractAction
 
             $locale = trim($target->code);
 
+            $translatedPayload = $this->buildTranslatedPayload($locale);
+
+            if ($translatedPayload['title'] === $this->model->title) {
+                Log::warning('TranslatePost: translation service returned source text unchanged; skipping locale', [
+                    'post_id' => $this->model->id,
+                    'locale' => $locale,
+                ]);
+
+                return;
+            }
+
             $payload = array_merge(
-                $this->buildTranslatedPayload($locale),
+                $translatedPayload,
                 $this->getCommonFields(),
                 [
                     'alternate_of' => $this->model->id,
