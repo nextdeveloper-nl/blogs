@@ -2,6 +2,7 @@
 
 namespace NextDeveloper\Blogs\Helpers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Commons\Helpers\SlugHelper;
@@ -21,6 +22,26 @@ trait TranslatablePostHelper
     protected const MAX_RETRIES = 3;
 
     protected const MIN_COMPLETION_RATIO = 0.8;
+
+    /**
+     * Removes poisoned cache rows where the stored translation equals the
+     * source text for this post's translatable fields and the requested locales.
+     *
+     * @param  array<int, string>  $locales
+     */
+    protected function purgePoisonedTranslationCache(array $locales): int
+    {
+        $hashes = $this->buildTranslationHashesForLocales($locales);
+
+        if (empty($hashes)) {
+            return 0;
+        }
+
+        return DB::table('i18n_translations')
+            ->whereIn('hash', $hashes)
+            ->whereColumn('text', 'translation')
+            ->delete();
+    }
 
     /**
      * Fields copied verbatim from the source post onto every translation.
@@ -81,6 +102,75 @@ trait TranslatablePostHelper
     }
 
     /**
+     * @param  array<int, string>  $locales
+     * @return array<int, string>
+     */
+    protected function buildTranslationHashesForLocales(array $locales): array
+    {
+        $normalizedLocales = array_values(array_unique(array_filter(array_map(
+            fn (string $locale): string => strtolower(trim($locale)),
+            $locales
+        ))));
+
+        if (empty($normalizedLocales)) {
+            return [];
+        }
+
+        $hashes = [];
+
+        foreach ($normalizedLocales as $locale) {
+            foreach ($this->collectTranslatableTexts() as $text) {
+                $hashes[] = $locale.hash('xxh3', $text);
+            }
+        }
+
+        return array_values(array_unique($hashes));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function collectTranslatableTexts(): array
+    {
+        $tags = $this->model->tags ?? [];
+
+        if (! is_array($tags)) {
+            $tags = json_decode($tags, true) ?? [];
+        }
+
+        $tagsJoined = implode(',', array_map(
+            fn ($tag): string => trim(str_replace('"', '', (string) $tag)),
+            $tags
+        ));
+
+        $texts = array_merge(
+            array_values(array_filter([
+                $this->model->title,
+                $this->model->abstract,
+                $this->model->meta_title,
+                $this->model->meta_description,
+                $this->model->meta_keywords,
+                $tagsJoined ?: null,
+            ], fn ($text): bool => is_string($text) && trim($text) !== '')),
+            $this->collectBodyChunks()
+        );
+
+        return array_values(array_unique($texts));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function collectBodyChunks(): array
+    {
+        if (empty($this->model->body)) {
+            return [];
+        }
+
+        return $this->splitBodyIntoChunks($this->model->body);
+    }
+
+    /**
      * Translates a single scalar field. Returns the translated string, or the
      * original string as a fallback. Returns null only if the source was empty.
      */
@@ -98,10 +188,19 @@ trait TranslatablePostHelper
                 'error' => $e->getMessage(),
             ]);
 
-            return $text;
+            return null;
         }
 
-        return $this->extractTranslation($result) ?? $text;
+        $translated = $this->extractTranslation($result);
+
+        // A translation that equals the source means the service returned the
+        // text unchanged (API failure or poisoned cache entry). Treat it as a
+        // miss so callers fall back to the original field value explicitly.
+        if ($translated === null || $translated === $text) {
+            return null;
+        }
+
+        return $translated;
     }
 
     /**
@@ -130,8 +229,10 @@ trait TranslatablePostHelper
             return [];
         }
 
+        $joined = implode(',', $cleaned);
+
         try {
-            $result = I18nTranslationService::translate(['text' => implode(',', $cleaned)], $locale);
+            $result = I18nTranslationService::translate(['text' => $joined], $locale);
         } catch (\Throwable $e) {
             Log::warning('TranslatablePostHelper: tag translation failed', [
                 'locale' => $locale,
@@ -143,7 +244,7 @@ trait TranslatablePostHelper
 
         $translated = $this->extractTranslation($result);
 
-        if (! $translated) {
+        if (! $translated || $translated === $joined) {
             return $cleaned;
         }
 

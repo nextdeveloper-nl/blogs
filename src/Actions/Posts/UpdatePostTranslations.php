@@ -64,6 +64,16 @@ class UpdatePostTranslations extends AbstractAction
                 return;
             }
 
+            $purgedCount = $this->purgePoisonedTranslationCache(array_column($validAlternates, 'locale'));
+
+            if ($purgedCount > 0) {
+                Log::info('UpdatePostTranslations: purged poisoned translation cache entries', [
+                    'post_id' => $this->model->id,
+                    'deleted_count' => $purgedCount,
+                    'locales' => array_values(array_unique(array_column($validAlternates, 'locale'))),
+                ]);
+            }
+
             $this->updateAlternates($validAlternates);
 
             $this->syncAlternatesColumn($validAlternates);

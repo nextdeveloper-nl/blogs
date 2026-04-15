@@ -74,6 +74,17 @@ class TranslatePost extends AbstractAction
                 return;
             }
 
+            $targetLocales = $this->resolveTargetLocales($targetAccountIds);
+            $purgedCount = $this->purgePoisonedTranslationCache($targetLocales);
+
+            if ($purgedCount > 0) {
+                Log::info('TranslatePost: purged poisoned translation cache entries', [
+                    'post_id' => $this->model->id,
+                    'locales' => $targetLocales,
+                    'deleted_count' => $purgedCount,
+                ]);
+            }
+
             $this->translateToTargets($targetAccountIds);
 
             $this->setProgress(100, 'Post translations created successfully.');
@@ -149,6 +160,31 @@ class TranslatePost extends AbstractAction
         return Languages::withoutGlobalScope(AuthorizationScope::class)
             ->where('id', $commonLanguageId)
             ->first();
+    }
+
+    /**
+     * @param  array<int, int>  $targetAccountIds
+     * @return array<int, string>
+     */
+    private function resolveTargetLocales(array $targetAccountIds): array
+    {
+        $locales = [];
+
+        foreach ($targetAccountIds as $accountId) {
+            $destinationAccount = AccountsService::getById($accountId);
+
+            if (! $destinationAccount) {
+                continue;
+            }
+
+            $targetLanguage = $this->resolveLanguage($destinationAccount->common_language_id);
+
+            if ($targetLanguage && ! empty($targetLanguage->code)) {
+                $locales[] = $targetLanguage->code;
+            }
+        }
+
+        return array_values(array_unique($locales));
     }
 
     /**
