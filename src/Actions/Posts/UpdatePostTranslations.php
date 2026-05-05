@@ -64,16 +64,6 @@ class UpdatePostTranslations extends AbstractAction
                 return;
             }
 
-            $purgedCount = $this->purgePoisonedTranslationCache(array_column($validAlternates, 'locale'));
-
-            if ($purgedCount > 0) {
-                Log::info('UpdatePostTranslations: purged poisoned translation cache entries', [
-                    'post_id' => $this->model->id,
-                    'deleted_count' => $purgedCount,
-                    'locales' => array_values(array_unique(array_column($validAlternates, 'locale'))),
-                ]);
-            }
-
             $this->updateAlternates($validAlternates);
 
             $this->syncAlternatesColumn($validAlternates);
@@ -179,13 +169,24 @@ class UpdatePostTranslations extends AbstractAction
 
         $locale = strtolower(trim($alternate['locale']));
 
+        $sourceCode = strtolower(trim((string) $this->model->locale));
+
+        if ($sourceCode !== '' && $sourceCode === $locale) {
+            Log::info('UpdatePostTranslations: target locale matches source; skipping', [
+                'post_id' => $this->model->id,
+                'locale' => $locale,
+            ]);
+
+            return;
+        }
+
         DB::transaction(function () use ($alternate, $locale): void {
             $translatedPost = Posts::withoutGlobalScopes()
                 ->where('id', $alternate['id'])
                 ->lockForUpdate()
                 ->first();
 
-            if (! $translatedPost) {
+            if (!$translatedPost) {
                 Log::warning('UpdatePostTranslations: alternate post vanished', [
                     'alternate_id' => $alternate['id'],
                     'locale' => $locale,
@@ -244,7 +245,7 @@ class UpdatePostTranslations extends AbstractAction
         foreach ($alternates as $alternate) {
             $post = $fresh->get($alternate['id']);
 
-            if (! $post) {
+            if (!$post) {
                 continue;
             }
 
@@ -271,7 +272,7 @@ class UpdatePostTranslations extends AbstractAction
             'trace' => $e->getTraceAsString(),
         ]);
 
-        $this->setFinishedWithError('Post alternate update failed: '.$e->getMessage());
+        $this->setFinishedWithError('Post alternate update failed: ' . $e->getMessage());
 
         throw $e;
     }
