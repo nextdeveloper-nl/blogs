@@ -2,11 +2,10 @@
 
 namespace NextDeveloper\Blogs\Helpers;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use NextDeveloper\Blogs\Database\Models\Posts;
+use NextDeveloper\Blogs\Services\PostTranslationService;
 use NextDeveloper\Commons\Helpers\SlugHelper;
-use NextDeveloper\I18n\Services\I18nTranslationService;
 
 /**
  * Provides translation capabilities for blog posts.
@@ -23,24 +22,30 @@ trait TranslatablePostHelper
 
     protected const MIN_COMPLETION_RATIO = 0.8;
 
-    /**
-     * Removes poisoned cache rows where the stored translation equals the
-     * source text for this post's translatable fields and the requested locales.
-     *
-     * @param  array<int, string>  $locales
-     */
-    protected function purgePoisonedTranslationCache(array $locales): int
-    {
-        $hashes = $this->buildTranslationHashesForLocales($locales);
+    private ?PostTranslationService $postTranslator = null;
 
-        if (empty($hashes)) {
-            return 0;
+    protected function translator(): PostTranslationService
+    {
+        return $this->postTranslator ??= new PostTranslationService();
+    }
+
+    /**
+     * Returns the ISO-639-1 source locale from the post's locale column.
+     * Null when the column is empty (translator will auto-detect).
+     */
+    protected function sourceLocale(): ?string
+    {
+        $locale = $this->model->locale ?? null;
+
+        if ($locale === null || trim((string) $locale) === '') {
+            Log::warning('TranslatablePostHelper: post has no locale set; source language will be auto-detected', [
+                'post_id' => $this->model->id ?? null,
+            ]);
+
+            return null;
         }
 
-        return DB::table('i18n_translations')
-            ->whereIn('hash', $hashes)
-            ->whereColumn('text', 'translation')
-            ->delete();
+        return strtolower(trim((string) $locale));
     }
 
     /**
@@ -102,75 +107,6 @@ trait TranslatablePostHelper
     }
 
     /**
-     * @param  array<int, string>  $locales
-     * @return array<int, string>
-     */
-    protected function buildTranslationHashesForLocales(array $locales): array
-    {
-        $normalizedLocales = array_values(array_unique(array_filter(array_map(
-            fn (string $locale): string => strtolower(trim($locale)),
-            $locales
-        ))));
-
-        if (empty($normalizedLocales)) {
-            return [];
-        }
-
-        $hashes = [];
-
-        foreach ($normalizedLocales as $locale) {
-            foreach ($this->collectTranslatableTexts() as $text) {
-                $hashes[] = $locale.hash('xxh3', $text);
-            }
-        }
-
-        return array_values(array_unique($hashes));
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    protected function collectTranslatableTexts(): array
-    {
-        $tags = $this->model->tags ?? [];
-
-        if (! is_array($tags)) {
-            $tags = json_decode($tags, true) ?? [];
-        }
-
-        $tagsJoined = implode(',', array_map(
-            fn ($tag): string => trim(str_replace('"', '', (string) $tag)),
-            $tags
-        ));
-
-        $texts = array_merge(
-            array_values(array_filter([
-                $this->model->title,
-                $this->model->abstract,
-                $this->model->meta_title,
-                $this->model->meta_description,
-                $this->model->meta_keywords,
-                $tagsJoined ?: null,
-            ], fn ($text): bool => is_string($text) && trim($text) !== '')),
-            $this->collectBodyChunks()
-        );
-
-        return array_values(array_unique($texts));
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    protected function collectBodyChunks(): array
-    {
-        if (empty($this->model->body)) {
-            return [];
-        }
-
-        return $this->splitBodyIntoChunks($this->model->body);
-    }
-
-    /**
      * Translates a single scalar field. Returns the translated string, or the
      * original string as a fallback. Returns null only if the source was empty.
      */
@@ -181,7 +117,7 @@ trait TranslatablePostHelper
         }
 
         try {
-            $result = I18nTranslationService::translate(['text' => $text], $locale);
+            $translated = $this->translator()->translate($text, $locale, $this->sourceLocale());
         } catch (\Throwable $e) {
             Log::warning('TranslatablePostHelper: field translation failed', [
                 'locale' => $locale,
@@ -191,12 +127,9 @@ trait TranslatablePostHelper
             return null;
         }
 
-        $translated = $this->extractTranslation($result);
-
-        // A translation that equals the source means the service returned the
-        // text unchanged (API failure or poisoned cache entry). Treat it as a
-        // miss so callers fall back to the original field value explicitly.
-        if ($translated === null || $translated === $text) {
+        // A translation equalling the source means the service returned the
+        // text unchanged (API failure or same-language). Treat as a miss.
+        if ($translated === '' || $translated === $text) {
             return null;
         }
 
@@ -216,12 +149,12 @@ trait TranslatablePostHelper
             return [];
         }
 
-        if (! is_array($tags)) {
+        if (!is_array($tags)) {
             $tags = [$tags];
         }
 
         $cleaned = array_values(array_filter(array_map(
-            fn ($tag): string => trim(str_replace('"', '', (string) $tag)),
+            fn($tag): string => trim(str_replace('"', '', (string) $tag)),
             $tags
         )));
 
@@ -232,7 +165,7 @@ trait TranslatablePostHelper
         $joined = implode(',', $cleaned);
 
         try {
-            $result = I18nTranslationService::translate(['text' => $joined], $locale);
+            $translated = $this->translator()->translate($joined, $locale, $this->sourceLocale());
         } catch (\Throwable $e) {
             Log::warning('TranslatablePostHelper: tag translation failed', [
                 'locale' => $locale,
@@ -242,9 +175,7 @@ trait TranslatablePostHelper
             return $cleaned;
         }
 
-        $translated = $this->extractTranslation($result);
-
-        if (! $translated || $translated === $joined) {
+        if (!$translated || $translated === $joined) {
             return $cleaned;
         }
 
@@ -262,30 +193,6 @@ trait TranslatablePostHelper
         }
 
         return $this->translateBodyWithChunking($locale);
-    }
-
-    /**
-     * Normalizes the translation service response. The service returns a
-     * model on a fresh translation and a plain array on cache hit, both of
-     * which expose a `translation` value.
-     *
-     * @param  mixed  $result
-     */
-    protected function extractTranslation($result): ?string
-    {
-        if (! $result) {
-            return null;
-        }
-
-        if (is_object($result) && isset($result->translation)) {
-            return (string) $result->translation;
-        }
-
-        if (is_array($result) && ! empty($result['translation'])) {
-            return (string) $result['translation'];
-        }
-
-        return null;
     }
 
     /**
@@ -329,10 +236,9 @@ trait TranslatablePostHelper
     {
         for ($attempt = 1; $attempt <= self::MAX_RETRIES; $attempt++) {
             try {
-                $translation = I18nTranslationService::translate(['text' => $chunk], $target);
-                $translatedText = $this->extractTranslation($translation);
+                $translatedText = $this->translator()->translate($chunk, $target, $this->sourceLocale());
 
-                if ($translatedText === null || $translatedText === '') {
+                if ($translatedText === '') {
                     throw new \RuntimeException('Empty translation received');
                 }
 
@@ -351,7 +257,7 @@ trait TranslatablePostHelper
                 ]);
 
                 if ($attempt === self::MAX_RETRIES) {
-                    Log::error("Failed to translate chunk {$index} after ".self::MAX_RETRIES.' attempts');
+                    Log::error("Failed to translate chunk {$index} after " . self::MAX_RETRIES . ' attempts');
 
                     return $chunk;
                 }
@@ -382,10 +288,9 @@ trait TranslatablePostHelper
 
         foreach ($subChunks as $subChunk) {
             try {
-                $result = I18nTranslationService::translate(['text' => $subChunk], $target);
-                $text = $this->extractTranslation($result);
+                $text = $this->translator()->translate($subChunk, $target, $this->sourceLocale());
 
-                if ($text !== null && $text !== '') {
+                if ($text !== '') {
                     $translations[] = trim($text);
                 }
             } catch (\Throwable $e) {
@@ -405,13 +310,13 @@ trait TranslatablePostHelper
         $currentChunk = '';
 
         foreach ($sentences as $sentence) {
-            if (mb_strlen($currentChunk.' '.$sentence) > 800) {
+            if (mb_strlen($currentChunk . ' ' . $sentence) > 800) {
                 if ($currentChunk !== '') {
                     $chunks[] = $currentChunk;
                 }
                 $currentChunk = $sentence;
             } else {
-                $currentChunk = $currentChunk === '' ? $sentence : $currentChunk.' '.$sentence;
+                $currentChunk = $currentChunk === '' ? $sentence : $currentChunk . ' ' . $sentence;
             }
         }
 
@@ -435,14 +340,14 @@ trait TranslatablePostHelper
                 continue;
             }
 
-            if (mb_strlen($currentChunk."\n\n".$paragraph) > self::MAX_CHUNK_LENGTH) {
+            if (mb_strlen($currentChunk . "\n\n" . $paragraph) > self::MAX_CHUNK_LENGTH) {
                 if ($currentChunk !== '') {
                     $chunks[] = $currentChunk;
                 }
                 $chunks[] = $paragraph;
                 $currentChunk = '';
             } else {
-                $currentChunk = $currentChunk === '' ? $paragraph : $currentChunk."\n\n".$paragraph;
+                $currentChunk = $currentChunk === '' ? $paragraph : $currentChunk . "\n\n" . $paragraph;
             }
         }
 
@@ -484,13 +389,13 @@ trait TranslatablePostHelper
                 return $alt;
             })
             ->filter(function ($alt) {
-                return ! empty($alt['id'])
-                    && ! empty($alt['locale'])
+                return !empty($alt['id'])
+                    && !empty($alt['locale'])
                     && is_int($alt['id'])
                     && is_string($alt['locale']);
             })
             ->unique(function ($item) {
-                return $item['locale'].'|'.$item['id'];
+                return $item['locale'] . '|' . $item['id'];
             })
             ->values()
             ->toArray();

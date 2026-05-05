@@ -54,13 +54,13 @@ class TranslatePost extends AbstractAction
             $blogAccount = AccountsService::getBlogAccount($this->model);
             $this->setProgress(10, 'Retrieving blog account ...');
 
-            if (! $blogAccount) {
+            if (!$blogAccount) {
                 $this->setFinished('Cannot find a blog account for this post. Please consult your Leo provider.');
 
                 return;
             }
 
-            if (! $blogAccount->is_auto_translate_enabled) {
+            if (!$blogAccount->is_auto_translate_enabled) {
                 $this->setFinished('Auto-translation is disabled for this blog account.');
 
                 return;
@@ -72,17 +72,6 @@ class TranslatePost extends AbstractAction
                 $this->setFinished('No destination languages configured on this blog account.');
 
                 return;
-            }
-
-            $targetLocales = $this->resolveTargetLocales($targetAccountIds);
-            $purgedCount = $this->purgePoisonedTranslationCache($targetLocales);
-
-            if ($purgedCount > 0) {
-                Log::info('TranslatePost: purged poisoned translation cache entries', [
-                    'post_id' => $this->model->id,
-                    'locales' => $targetLocales,
-                    'deleted_count' => $purgedCount,
-                ]);
             }
 
             $this->translateToTargets($targetAccountIds);
@@ -110,7 +99,7 @@ class TranslatePost extends AbstractAction
 
             $destinationAccount = AccountsService::getById($accountId);
 
-            if (! $destinationAccount) {
+            if (!$destinationAccount) {
                 Log::warning('TranslatePost: destination account not found', [
                     'post_id' => $this->model->id,
                     'account_id' => $accountId,
@@ -121,11 +110,23 @@ class TranslatePost extends AbstractAction
 
             $targetLanguage = $this->resolveLanguage($destinationAccount->common_language_id);
 
-            if (! $targetLanguage) {
+            if (!$targetLanguage) {
                 Log::warning('TranslatePost: target language not found', [
                     'post_id' => $this->model->id,
                     'account_id' => $destinationAccount->id,
                     'common_language_id' => $destinationAccount->common_language_id,
+                ]);
+
+                continue;
+            }
+
+            $sourceCode = strtolower(trim((string) $this->model->locale));
+            $targetCode = strtolower(trim($targetLanguage->code));
+
+            if ($sourceCode !== '' && $sourceCode === $targetCode) {
+                Log::info('TranslatePost: target locale matches source; skipping', [
+                    'post_id' => $this->model->id,
+                    'locale' => $targetCode,
                 ]);
 
                 continue;
@@ -153,38 +154,13 @@ class TranslatePost extends AbstractAction
 
     private function resolveLanguage($commonLanguageId): ?Languages
     {
-        if (! $commonLanguageId) {
+        if (!$commonLanguageId) {
             return null;
         }
 
         return Languages::withoutGlobalScope(AuthorizationScope::class)
             ->where('id', $commonLanguageId)
             ->first();
-    }
-
-    /**
-     * @param  array<int, int>  $targetAccountIds
-     * @return array<int, string>
-     */
-    private function resolveTargetLocales(array $targetAccountIds): array
-    {
-        $locales = [];
-
-        foreach ($targetAccountIds as $accountId) {
-            $destinationAccount = AccountsService::getById($accountId);
-
-            if (! $destinationAccount) {
-                continue;
-            }
-
-            $targetLanguage = $this->resolveLanguage($destinationAccount->common_language_id);
-
-            if ($targetLanguage && ! empty($targetLanguage->code)) {
-                $locales[] = $targetLanguage->code;
-            }
-        }
-
-        return array_values(array_unique($locales));
     }
 
     /**
@@ -197,7 +173,7 @@ class TranslatePost extends AbstractAction
                 ->lockForUpdate()
                 ->first();
 
-            if (! $lockedPost) {
+            if (!$lockedPost) {
                 return;
             }
 
@@ -237,7 +213,7 @@ class TranslatePost extends AbstractAction
 
             $translatedPost = Posts::forceCreateQuietly($payload);
 
-            if (! $translatedPost) {
+            if (!$translatedPost) {
                 throw new Exception("Failed to create translated post for locale: {$locale}");
             }
 
@@ -288,7 +264,7 @@ class TranslatePost extends AbstractAction
             'trace' => $e->getTraceAsString(),
         ]);
 
-        $this->setFinishedWithError('Post translation failed: '.$e->getMessage());
+        $this->setFinishedWithError('Post translation failed: ' . $e->getMessage());
 
         throw $e;
     }
