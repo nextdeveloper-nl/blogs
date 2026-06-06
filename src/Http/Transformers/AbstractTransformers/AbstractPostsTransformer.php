@@ -91,6 +91,7 @@ class AbstractPostsTransformer extends AbstractTransformer
             'alternate_of'  =>  $model->alternate_of,
             'locale'  =>  $model->locale,
             'blog_account_id'  =>  $blogAccountId ? $blogAccountId->uuid : null,
+            'faqs'  =>  $model->faqs,
             ]
         );
     }
@@ -179,6 +180,8 @@ class AbstractPostsTransformer extends AbstractTransformer
         return $this->collection($addresses, new AddressesTransformer());
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+
 
 
 
