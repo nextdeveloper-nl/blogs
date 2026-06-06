@@ -43,6 +43,7 @@ use NextDeveloper\Commons\Database\Traits\HasObject;
  * @property string $locale
  * @property $alternates
  * @property integer $alternate_of
+ * @property $faqs
  * @property string $author
  * @property string $team
  * @property integer $common_category_id
@@ -91,6 +92,7 @@ class PostsPerspective extends Model
             'locale',
             'alternates',
             'alternate_of',
+            'faqs',
             'author',
             'team',
             'common_category_id',
@@ -140,6 +142,7 @@ class PostsPerspective extends Model
     'locale' => 'string',
     'alternates' => 'array',
     'alternate_of' => 'integer',
+    'faqs' => 'array',
     'author' => 'string',
     'team' => 'string',
     'common_category_id' => 'integer',
@@ -209,6 +212,7 @@ class PostsPerspective extends Model
     }
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 
 
 

@@ -21,7 +21,7 @@ use NextDeveloper\Commons\Database\Traits\RunAsAdministrator;
  * @property integer $id
  * @property string $uuid
  * @property integer $blog_post_id
- * @property $slug
+ * @property string $slug
  * @property integer $iam_account_id
  * @property integer $iam_user_id
  * @property \Carbon\Carbon $created_at
@@ -72,6 +72,7 @@ class PostSlugHistories extends Model
     protected $casts = [
     'id' => 'integer',
     'blog_post_id' => 'integer',
+    'slug' => 'string',
     'created_at' => 'datetime',
     'updated_at' => 'datetime',
     'deleted_at' => 'datetime',
@@ -141,5 +142,6 @@ class PostSlugHistories extends Model
     }
     
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 
 }

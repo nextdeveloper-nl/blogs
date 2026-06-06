@@ -14,7 +14,7 @@ class PostSlugHistoriesCreateRequest extends AbstractFormRequest
     {
         return [
             'blog_post_id' => 'required|exists:blog_posts,uuid|uuid',
-        'slug' => 'required',
+        'slug' => 'required|string',
         ];
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE

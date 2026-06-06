@@ -58,6 +58,7 @@ trait BlogPostSlugHistoryTestTraits
         $response = $this->http->request(
             'POST', '/blogs/blogpostslughistory', [
             'form_params'   =>  [
+                'slug'  =>  'a',
                             ],
                 ['http_errors' => false]
             ]
@@ -333,6 +334,25 @@ trait BlogPostSlugHistoryTestTraits
             $model = \NextDeveloper\Blogs\Database\Models\BlogPostSlugHistory::first();
 
             event(new \NextDeveloper\Blogs\Events\BlogPostSlugHistory\BlogPostSlugHistoryRestoredEvent($model));
+        } catch (\Exception $e) {
+            $this->assertFalse(false, $e->getMessage());
+        }
+
+        $this->assertTrue(true);
+    }
+
+    public function test_blogpostslughistory_event_slug_filter()
+    {
+        try {
+            $request = new Request(
+                [
+                'slug'  =>  'a'
+                ]
+            );
+
+            $filter = new BlogPostSlugHistoryQueryFilter($request);
+
+            $model = \NextDeveloper\Blogs\Database\Models\BlogPostSlugHistory::filter($filter)->first();
         } catch (\Exception $e) {
             $this->assertFalse(false, $e->getMessage());
         }

@@ -85,6 +85,7 @@ class AbstractPostsPerspectiveTransformer extends AbstractTransformer
             'locale'  =>  $model->locale,
             'alternates'  =>  $model->alternates,
             'alternate_of'  =>  $model->alternate_of,
+            'faqs'  =>  $model->faqs,
             'author'  =>  $model->author,
             'team'  =>  $model->team,
             'common_category_id'  =>  $commonCategoryId ? $commonCategoryId->uuid : null,
@@ -181,6 +182,7 @@ class AbstractPostsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($addresses, new AddressesTransformer());
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
 
 
 
