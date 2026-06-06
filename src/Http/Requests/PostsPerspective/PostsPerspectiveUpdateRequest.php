@@ -34,6 +34,7 @@ class PostsPerspectiveUpdateRequest extends AbstractFormRequest
         'locale' => 'nullable|string',
         'alternates' => 'nullable',
         'alternate_of' => 'nullable|integer',
+        'faqs' => 'nullable',
         'author' => 'nullable|string',
         'team' => 'nullable|string',
         'common_category_id' => 'nullable|exists:common_categories,uuid|uuid',
