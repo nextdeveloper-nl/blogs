@@ -12,6 +12,7 @@ use NextDeveloper\Commons\Common\Cache\Traits\CleanCache;
 use NextDeveloper\Commons\Database\Traits\Taggable;
 use NextDeveloper\Commons\Database\Traits\HasStates;
 use NextDeveloper\Commons\Database\Traits\RunAsAdministrator;
+use NextDeveloper\Commons\Database\Traits\HasObject;
 
 /**
  * Accounts model.
@@ -19,19 +20,20 @@ use NextDeveloper\Commons\Database\Traits\RunAsAdministrator;
  * @package  NextDeveloper\Blogs\Database\Models
  * @property integer $id
  * @property string $uuid
- * @property integer $common_domain_id
- * @property $alternate
- * @property boolean $is_auto_translate_enabled
+ * @property array $limits
+ * @property boolean $is_suspended
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $deleted_at
- * @property $limits
- * @property boolean $is_suspended
+ * @property $alternate
+ * @property integer $common_domain_id
+ * @property boolean $is_auto_translate_enabled
  * @property integer $common_language_id
+ * @property integer $iam_account_id
  */
 class Accounts extends Model
 {
-    use Filterable, UuidId, CleanCache, Taggable, HasStates, RunAsAdministrator;
+    use Filterable, UuidId, CleanCache, Taggable, HasStates, RunAsAdministrator, HasObject;
     use SoftDeletes;
 
     public $timestamps = true;
@@ -45,12 +47,13 @@ class Accounts extends Model
     protected $guarded = [];
 
     protected $fillable = [
-            'common_domain_id',
-            'alternate',
-            'is_auto_translate_enabled',
             'limits',
             'is_suspended',
+            'alternate',
+            'common_domain_id',
+            'is_auto_translate_enabled',
             'common_language_id',
+            'iam_account_id',
     ];
 
     /**
@@ -74,14 +77,14 @@ class Accounts extends Model
      */
     protected $casts = [
     'id' => 'integer',
-    'common_domain_id' => 'integer',
-    'alternate' => 'array',
-    'is_auto_translate_enabled' => 'boolean',
+    'limits' => \NextDeveloper\Commons\Database\Casts\TextArray::class,
+    'is_suspended' => 'boolean',
     'created_at' => 'datetime',
     'updated_at' => 'datetime',
     'deleted_at' => 'datetime',
-    'limits' => 'array',
-    'is_suspended' => 'boolean',
+    'alternate' => 'array',
+    'common_domain_id' => 'integer',
+    'is_auto_translate_enabled' => 'boolean',
     'common_language_id' => 'integer',
     ];
 
@@ -143,12 +146,9 @@ class Accounts extends Model
         }
     }
 
-    public function domains() : \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(\NextDeveloper\Commons\Database\Models\Domains::class);
-    }
-    
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+
 
 
 

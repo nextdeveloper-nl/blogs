@@ -2,6 +2,27 @@
 
 Route::prefix('blogs')->group(
     function () {
+        Route::prefix('posts')->group(
+            function () {
+                Route::get('/', 'Posts\PostsController@index');
+                Route::get('/actions', 'Posts\PostsController@getActions');
+
+                Route::get('{blog_posts}/tags ', 'Posts\PostsController@tags');
+                Route::post('{blog_posts}/tags ', 'Posts\PostsController@saveTags');
+                Route::get('{blog_posts}/addresses ', 'Posts\PostsController@addresses');
+                Route::post('{blog_posts}/addresses ', 'Posts\PostsController@saveAddresses');
+
+                Route::get('/{blog_posts}/{subObjects}', 'Posts\PostsController@relatedObjects');
+                Route::get('/{blog_posts}', 'Posts\PostsController@show');
+
+                Route::post('/', 'Posts\PostsController@store');
+                Route::post('/{blog_posts}/do/{action}', 'Posts\PostsController@doAction');
+
+                Route::patch('/{blog_posts}', 'Posts\PostsController@update');
+                Route::delete('/{blog_posts}', 'Posts\PostsController@destroy');
+            }
+        );
+
         Route::prefix('accounts')->group(
             function () {
                 Route::get('/', 'Accounts\AccountsController@index');
@@ -23,24 +44,24 @@ Route::prefix('blogs')->group(
             }
         );
 
-        Route::prefix('posts')->group(
+        Route::prefix('post-slug-histories')->group(
             function () {
-                Route::get('/', 'Posts\PostsController@index');
-                Route::get('/actions', 'Posts\PostsController@getActions');
+                Route::get('/', 'PostSlugHistories\PostSlugHistoriesController@index');
+                Route::get('/actions', 'PostSlugHistories\PostSlugHistoriesController@getActions');
 
-                Route::get('{blog_posts}/tags ', 'Posts\PostsController@tags');
-                Route::post('{blog_posts}/tags ', 'Posts\PostsController@saveTags');
-                Route::get('{blog_posts}/addresses ', 'Posts\PostsController@addresses');
-                Route::post('{blog_posts}/addresses ', 'Posts\PostsController@saveAddresses');
+                Route::get('{blog_post_slug_histories}/tags ', 'PostSlugHistories\PostSlugHistoriesController@tags');
+                Route::post('{blog_post_slug_histories}/tags ', 'PostSlugHistories\PostSlugHistoriesController@saveTags');
+                Route::get('{blog_post_slug_histories}/addresses ', 'PostSlugHistories\PostSlugHistoriesController@addresses');
+                Route::post('{blog_post_slug_histories}/addresses ', 'PostSlugHistories\PostSlugHistoriesController@saveAddresses');
 
-                Route::get('/{blog_posts}/{subObjects}', 'Posts\PostsController@relatedObjects');
-                Route::get('/{blog_posts}', 'Posts\PostsController@show');
+                Route::get('/{blog_post_slug_histories}/{subObjects}', 'PostSlugHistories\PostSlugHistoriesController@relatedObjects');
+                Route::get('/{blog_post_slug_histories}', 'PostSlugHistories\PostSlugHistoriesController@show');
 
-                Route::post('/', 'Posts\PostsController@store');
-                Route::post('/{blog_posts}/do/{action}', 'Posts\PostsController@doAction');
+                Route::post('/', 'PostSlugHistories\PostSlugHistoriesController@store');
+                Route::post('/{blog_post_slug_histories}/do/{action}', 'PostSlugHistories\PostSlugHistoriesController@doAction');
 
-                Route::patch('/{blog_posts}', 'Posts\PostsController@update');
-                Route::delete('/{blog_posts}', 'Posts\PostsController@destroy');
+                Route::patch('/{blog_post_slug_histories}', 'PostSlugHistories\PostSlugHistoriesController@update');
+                Route::delete('/{blog_post_slug_histories}', 'PostSlugHistories\PostSlugHistoriesController@destroy');
             }
         );
 
@@ -134,8 +155,20 @@ Route::prefix('blogs')->group(
 
 
 
+
+
+
+
+
+
+
+
+
+
     }
 );
+
+
 
 
 

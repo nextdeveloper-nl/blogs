@@ -7,40 +7,35 @@ use NextDeveloper\Commons\Database\Traits\HasStates;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
 use NextDeveloper\Commons\Database\Traits\Filterable;
-use NextDeveloper\Blogs\Database\Observers\AccountsPerspectiveObserver;
+use NextDeveloper\Blogs\Database\Observers\PostSlugHistoriesObserver;
 use NextDeveloper\Commons\Database\Traits\UuidId;
+use NextDeveloper\Commons\Database\Traits\HasObject;
 use NextDeveloper\Commons\Common\Cache\Traits\CleanCache;
 use NextDeveloper\Commons\Database\Traits\Taggable;
 use NextDeveloper\Commons\Database\Traits\RunAsAdministrator;
-use NextDeveloper\Commons\Database\Traits\HasObject;
 
 /**
- * AccountsPerspective model.
+ * PostSlugHistories model.
  *
  * @package  NextDeveloper\Blogs\Database\Models
  * @property integer $id
  * @property string $uuid
- * @property string $name
- * @property boolean $is_active
- * @property array $tags
- * @property integer $common_domain_id
- * @property integer $common_language_id
- * @property array $limits
- * @property boolean $is_suspended
- * @property boolean $is_auto_translate_enabled
- * @property $alternate
+ * @property integer $blog_post_id
+ * @property $slug
+ * @property integer $iam_account_id
+ * @property integer $iam_user_id
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $deleted_at
  */
-class AccountsPerspective extends Model
+class PostSlugHistories extends Model
 {
     use Filterable, UuidId, CleanCache, Taggable, HasStates, RunAsAdministrator, HasObject;
     use SoftDeletes;
 
     public $timestamps = true;
 
-    protected $table = 'blog_accounts_perspective';
+    protected $table = 'blog_post_slug_histories';
 
 
     /**
@@ -49,15 +44,10 @@ class AccountsPerspective extends Model
     protected $guarded = [];
 
     protected $fillable = [
-            'name',
-            'is_active',
-            'tags',
-            'common_domain_id',
-            'common_language_id',
-            'limits',
-            'is_suspended',
-            'is_auto_translate_enabled',
-            'alternate',
+            'blog_post_id',
+            'slug',
+            'iam_account_id',
+            'iam_user_id',
     ];
 
     /**
@@ -81,15 +71,7 @@ class AccountsPerspective extends Model
      */
     protected $casts = [
     'id' => 'integer',
-    'name' => 'string',
-    'is_active' => 'boolean',
-    'tags' => \NextDeveloper\Commons\Database\Casts\TextArray::class,
-    'common_domain_id' => 'integer',
-    'common_language_id' => 'integer',
-    'limits' => \NextDeveloper\Commons\Database\Casts\TextArray::class,
-    'is_suspended' => 'boolean',
-    'is_auto_translate_enabled' => 'boolean',
-    'alternate' => 'array',
+    'blog_post_id' => 'integer',
     'created_at' => 'datetime',
     'updated_at' => 'datetime',
     'deleted_at' => 'datetime',
@@ -126,7 +108,7 @@ class AccountsPerspective extends Model
         parent::boot();
 
         //  We create and add Observer even if we wont use it.
-        parent::observe(AccountsPerspectiveObserver::class);
+        parent::observe(PostSlugHistoriesObserver::class);
 
         self::registerScopes();
     }
@@ -134,7 +116,7 @@ class AccountsPerspective extends Model
     public static function registerScopes()
     {
         $globalScopes = config('blogs.scopes.global');
-        $modelScopes = config('blogs.scopes.blog_accounts_perspective');
+        $modelScopes = config('blogs.scopes.blog_post_slug_histories');
 
         if(!$modelScopes) { $modelScopes = [];
         }
@@ -153,9 +135,11 @@ class AccountsPerspective extends Model
         }
     }
 
+    public function posts() : \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\NextDeveloper\Blogs\Database\Models\Posts::class);
+    }
+    
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
-
-
-
 
 }

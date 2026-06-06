@@ -1,10 +1,10 @@
 <?php
 
-namespace NextDeveloper\Blogs\Http\Requests\Accounts;
+namespace NextDeveloper\Blogs\Http\Requests\AccountsPerspective;
 
 use NextDeveloper\Commons\Http\Requests\AbstractFormRequest;
 
-class AccountsUpdateRequest extends AbstractFormRequest
+class AccountsPerspectiveUpdateRequest extends AbstractFormRequest
 {
 
     /**
@@ -13,12 +13,15 @@ class AccountsUpdateRequest extends AbstractFormRequest
     public function rules()
     {
         return [
-            'limits' => 'nullable',
-        'is_suspended' => 'boolean',
-        'alternate' => '',
+            'name' => 'nullable|string',
+        'is_active' => 'nullable|boolean',
+        'tags' => 'nullable',
         'common_domain_id' => 'nullable|exists:common_domains,uuid|uuid',
-        'is_auto_translate_enabled' => 'boolean',
         'common_language_id' => 'nullable|exists:common_languages,uuid|uuid',
+        'limits' => 'nullable',
+        'is_suspended' => 'nullable|boolean',
+        'is_auto_translate_enabled' => 'nullable|boolean',
+        'alternate' => 'nullable',
         ];
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
