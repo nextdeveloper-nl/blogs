@@ -40,31 +40,31 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
     
     public function slug($value)
     {
-        return $this->builder->where('slug', 'like', '%' . $value . '%');
+        return $this->builder->where('slug', 'ilike', '%' . $value . '%');
     }
 
         
     public function title($value)
     {
-        return $this->builder->where('title', 'like', '%' . $value . '%');
+        return $this->builder->where('title', 'ilike', '%' . $value . '%');
     }
 
         
     public function body($value)
     {
-        return $this->builder->where('body', 'like', '%' . $value . '%');
+        return $this->builder->where('body', 'ilike', '%' . $value . '%');
     }
 
         
     public function abstract($value)
     {
-        return $this->builder->where('abstract', 'like', '%' . $value . '%');
+        return $this->builder->where('abstract', 'ilike', '%' . $value . '%');
     }
 
         
     public function headerImage($value)
     {
-        return $this->builder->where('header_image', 'like', '%' . $value . '%');
+        return $this->builder->where('header_image', 'ilike', '%' . $value . '%');
     }
 
         //  This is an alias function of headerImage
@@ -75,7 +75,7 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
         
     public function metaTitle($value)
     {
-        return $this->builder->where('meta_title', 'like', '%' . $value . '%');
+        return $this->builder->where('meta_title', 'ilike', '%' . $value . '%');
     }
 
         //  This is an alias function of metaTitle
@@ -86,7 +86,7 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
         
     public function metaDescription($value)
     {
-        return $this->builder->where('meta_description', 'like', '%' . $value . '%');
+        return $this->builder->where('meta_description', 'ilike', '%' . $value . '%');
     }
 
         //  This is an alias function of metaDescription
@@ -97,7 +97,7 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
         
     public function metaKeywords($value)
     {
-        return $this->builder->where('meta_keywords', 'like', '%' . $value . '%');
+        return $this->builder->where('meta_keywords', 'ilike', '%' . $value . '%');
     }
 
         //  This is an alias function of metaKeywords
@@ -108,31 +108,31 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
         
     public function locale($value)
     {
-        return $this->builder->where('locale', 'like', '%' . $value . '%');
+        return $this->builder->where('locale', 'ilike', '%' . $value . '%');
     }
 
         
     public function author($value)
     {
-        return $this->builder->where('author', 'like', '%' . $value . '%');
+        return $this->builder->where('author', 'ilike', '%' . $value . '%');
     }
 
         
     public function team($value)
     {
-        return $this->builder->where('team', 'like', '%' . $value . '%');
+        return $this->builder->where('team', 'ilike', '%' . $value . '%');
     }
 
         
     public function category($value)
     {
-        return $this->builder->where('category', 'like', '%' . $value . '%');
+        return $this->builder->where('category', 'ilike', '%' . $value . '%');
     }
 
         
     public function domainName($value)
     {
-        return $this->builder->where('domain_name', 'like', '%' . $value . '%');
+        return $this->builder->where('domain_name', 'ilike', '%' . $value . '%');
     }
 
         //  This is an alias function of domainName
@@ -389,6 +389,8 @@ class PostsPerspectiveQueryFilter extends AbstractQueryFilter
     }
     
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+
 
 
 

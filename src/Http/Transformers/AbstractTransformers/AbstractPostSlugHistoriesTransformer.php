@@ -20,16 +20,16 @@ use NextDeveloper\Commons\Http\Transformers\MetaTransformer;
 use NextDeveloper\Commons\Http\Transformers\VotesTransformer;
 use NextDeveloper\Commons\Http\Transformers\AddressesTransformer;
 use NextDeveloper\Commons\Http\Transformers\PhoneNumbersTransformer;
-use NextDeveloper\Blogs\Database\Models\AccountsPerspective;
+use NextDeveloper\Blogs\Database\Models\PostSlugHistories;
 use NextDeveloper\Commons\Http\Transformers\AbstractTransformer;
 use NextDeveloper\IAM\Database\Scopes\AuthorizationScope;
 
 /**
- * Class AccountsPerspectiveTransformer. This class is being used to manipulate the data we are serving to the customer
+ * Class PostSlugHistoriesTransformer. This class is being used to manipulate the data we are serving to the customer
  *
  * @package NextDeveloper\Blogs\Http\Transformers
  */
-class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
+class AbstractPostSlugHistoriesTransformer extends AbstractTransformer
 {
 
     /**
@@ -48,27 +48,23 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
     ];
 
     /**
-     * @param AccountsPerspective $model
+     * @param PostSlugHistories $model
      *
      * @return array
      */
-    public function transform(AccountsPerspective $model)
+    public function transform(PostSlugHistories $model)
     {
-                                                $commonDomainId = \NextDeveloper\Commons\Database\Models\Domains::where('id', $model->common_domain_id)->first();
-                                                            $commonLanguageId = \NextDeveloper\Commons\Database\Models\Languages::where('id', $model->common_language_id)->first();
+                                                $blogPostId = \NextDeveloper\Blogs\Database\Models\Posts::where('id', $model->blog_post_id)->first();
+                                                            $iamAccountId = \NextDeveloper\IAM\Database\Models\Accounts::where('id', $model->iam_account_id)->first();
+                                                            $iamUserId = \NextDeveloper\IAM\Database\Models\Users::where('id', $model->iam_user_id)->first();
                         
         return $this->buildPayload(
             [
             'id'  =>  $model->uuid,
-            'name'  =>  $model->name,
-            'is_active'  =>  $model->is_active,
-            'tags'  =>  $model->tags,
-            'common_domain_id'  =>  $commonDomainId ? $commonDomainId->uuid : null,
-            'common_language_id'  =>  $commonLanguageId ? $commonLanguageId->uuid : null,
-            'limits'  =>  $model->limits,
-            'is_suspended'  =>  $model->is_suspended,
-            'is_auto_translate_enabled'  =>  $model->is_auto_translate_enabled,
-            'alternate'  =>  $model->alternate,
+            'blog_post_id'  =>  $blogPostId ? $blogPostId->uuid : null,
+            'slug'  =>  $model->slug,
+            'iam_account_id'  =>  $iamAccountId ? $iamAccountId->uuid : null,
+            'iam_user_id'  =>  $iamUserId ? $iamUserId->uuid : null,
             'created_at'  =>  $model->created_at,
             'updated_at'  =>  $model->updated_at,
             'deleted_at'  =>  $model->deleted_at,
@@ -76,7 +72,7 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
         );
     }
 
-    public function includeStates(AccountsPerspective $model)
+    public function includeStates(PostSlugHistories $model)
     {
         $states = States::where('object_type', get_class($model))
             ->where('object_id', $model->id)
@@ -85,7 +81,7 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($states, new StatesTransformer());
     }
 
-    public function includeActions(AccountsPerspective $model)
+    public function includeActions(PostSlugHistories $model)
     {
         $input = get_class($model);
         $input = str_replace('\\Database\\Models', '', $input);
@@ -97,7 +93,7 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($actions, new AvailableActionsTransformer());
     }
 
-    public function includeMedia(AccountsPerspective $model)
+    public function includeMedia(PostSlugHistories $model)
     {
         $media = Media::where('object_type', get_class($model))
             ->where('object_id', $model->id)
@@ -106,7 +102,7 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($media, new MediaTransformer());
     }
 
-    public function includeSocialMedia(AccountsPerspective $model)
+    public function includeSocialMedia(PostSlugHistories $model)
     {
         $socialMedia = SocialMedia::where('object_type', get_class($model))
             ->where('object_id', $model->id)
@@ -115,7 +111,7 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($socialMedia, new SocialMediaTransformer());
     }
 
-    public function includeComments(AccountsPerspective $model)
+    public function includeComments(PostSlugHistories $model)
     {
         $comments = Comments::where('object_type', get_class($model))
             ->where('object_id', $model->id)
@@ -124,7 +120,7 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($comments, new CommentsTransformer());
     }
 
-    public function includeVotes(AccountsPerspective $model)
+    public function includeVotes(PostSlugHistories $model)
     {
         $votes = Votes::where('object_type', get_class($model))
             ->where('object_id', $model->id)
@@ -133,7 +129,7 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($votes, new VotesTransformer());
     }
 
-    public function includeMeta(AccountsPerspective $model)
+    public function includeMeta(PostSlugHistories $model)
     {
         $meta = Meta::where('object_type', get_class($model))
             ->where('object_id', $model->id)
@@ -142,7 +138,7 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($meta, new MetaTransformer());
     }
 
-    public function includePhoneNumbers(AccountsPerspective $model)
+    public function includePhoneNumbers(PostSlugHistories $model)
     {
         $phoneNumbers = PhoneNumbers::where('object_type', get_class($model))
             ->where('object_id', $model->id)
@@ -151,7 +147,7 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($phoneNumbers, new PhoneNumbersTransformer());
     }
 
-    public function includeAddresses(AccountsPerspective $model)
+    public function includeAddresses(PostSlugHistories $model)
     {
         $addresses = Addresses::where('object_type', get_class($model))
             ->where('object_id', $model->id)
@@ -160,8 +156,5 @@ class AbstractAccountsPerspectiveTransformer extends AbstractTransformer
         return $this->collection($addresses, new AddressesTransformer());
     }
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
-
-
-
 
 }
