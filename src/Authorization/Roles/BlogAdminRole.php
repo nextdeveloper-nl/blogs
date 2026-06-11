@@ -5,7 +5,6 @@ namespace NextDeveloper\Blogs\Authorization\Roles;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use NextDeveloper\CRM\Database\Models\AccountManagers;
 use NextDeveloper\IAM\Authorization\Roles\AbstractRole;
 use NextDeveloper\IAM\Authorization\Roles\IAuthorizationRole;
 use NextDeveloper\IAM\Database\Models\Users;
@@ -24,18 +23,13 @@ class BlogAdminRole extends AbstractRole implements IAuthorizationRole
     /**
      * Applies basic member role sql for Eloquent
      *
-     * @param Builder $builder
-     * @param Model $model
      * @return void
      */
-    public function apply(Builder $builder, Model $model)
-    {
+    public function apply(Builder $builder, Model $model) {}
 
-    }
-
-    public function checkPrivileges(Users $users = null)
+    public function checkPrivileges(?Users $users = null)
     {
-        //return UserHelper::hasRole(self::NAME, $users);
+        // return UserHelper::hasRole(self::NAME, $users);
     }
 
     public function getModule()
@@ -43,13 +37,18 @@ class BlogAdminRole extends AbstractRole implements IAuthorizationRole
         return 'blogs';
     }
 
-    public function allowedOperations() :array
+    public function allowedOperations(): array
     {
         return [
             'blog_posts:read',
             'blog_posts:update',
             'blog_posts:create',
             'blog_posts:delete',
+
+            'blog_post_slug_histories:read',
+            'blog_post_slug_histories:create',
+            'blog_post_slug_histories:update',
+            'blog_post_slug_histories:delete',
 
             'blog_posts_perspective:read',
             'blog_accounts_perspective:read',
@@ -73,11 +72,11 @@ class BlogAdminRole extends AbstractRole implements IAuthorizationRole
 
     public function canBeApplied($column)
     {
-        if(self::DB_PREFIX === '*') {
+        if (self::DB_PREFIX === '*') {
             return true;
         }
 
-        if(Str::startsWith($column, self::DB_PREFIX)) {
+        if (Str::startsWith($column, self::DB_PREFIX)) {
             return true;
         }
 

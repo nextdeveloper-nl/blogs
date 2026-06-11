@@ -10,36 +10,20 @@ use NextDeveloper\Commons\Database\Filters\AbstractQueryFilter;
  * This class automatically puts where clause on database so that use can filter
  * data returned from the query.
  */
-class AccountsQueryFilter extends AbstractQueryFilter
+class PostSlugHistoriesQueryFilter extends AbstractQueryFilter
 {
 
     /**
      * @var Builder
      */
     protected $builder;
-
-    public function isSuspended($value)
+    
+    public function slug($value)
     {
-        return $this->builder->where('is_suspended', $value);
+        return $this->builder->where('slug', 'ilike', '%' . $value . '%');
     }
 
-        //  This is an alias function of isSuspended
-    public function is_suspended($value)
-    {
-        return $this->isSuspended($value);
-    }
-     
-    public function isAutoTranslateEnabled($value)
-    {
-        return $this->builder->where('is_auto_translate_enabled', $value);
-    }
-
-        //  This is an alias function of isAutoTranslateEnabled
-    public function is_auto_translate_enabled($value)
-    {
-        return $this->isAutoTranslateEnabled($value);
-    }
-     
+    
     public function createdAtStart($date)
     {
         return $this->builder->where('created_at', '>=', $date);
@@ -106,34 +90,19 @@ class AccountsQueryFilter extends AbstractQueryFilter
         return $this->deletedAtEnd($value);
     }
 
-    public function commonDomainId($value)
+    public function blogPostId($value)
     {
-            $commonDomain = \NextDeveloper\Commons\Database\Models\Domains::where('uuid', $value)->first();
+            $blogPost = \NextDeveloper\Blogs\Database\Models\Posts::where('uuid', $value)->first();
 
-        if($commonDomain) {
-            return $this->builder->where('common_domain_id', '=', $commonDomain->id);
+        if($blogPost) {
+            return $this->builder->where('blog_post_id', '=', $blogPost->id);
         }
     }
 
-        //  This is an alias function of commonDomain
-    public function common_domain_id($value)
+        //  This is an alias function of blogPost
+    public function blog_post_id($value)
     {
-        return $this->commonDomain($value);
-    }
-    
-    public function commonLanguageId($value)
-    {
-            $commonLanguage = \NextDeveloper\Commons\Database\Models\Languages::where('uuid', $value)->first();
-
-        if($commonLanguage) {
-            return $this->builder->where('common_language_id', '=', $commonLanguage->id);
-        }
-    }
-
-        //  This is an alias function of commonLanguage
-    public function common_language_id($value)
-    {
-        return $this->commonLanguage($value);
+        return $this->blogPost($value);
     }
     
     public function iamAccountId($value)
@@ -146,23 +115,17 @@ class AccountsQueryFilter extends AbstractQueryFilter
     }
 
     
+    public function iamUserId($value)
+    {
+            $iamUser = \NextDeveloper\IAM\Database\Models\Users::where('uuid', $value)->first();
+
+        if($iamUser) {
+            return $this->builder->where('iam_user_id', '=', $iamUser->id);
+        }
+    }
+
+    
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

@@ -12,6 +12,7 @@ use NextDeveloper\Commons\Database\Traits\UuidId;
 use NextDeveloper\Commons\Common\Cache\Traits\CleanCache;
 use NextDeveloper\Commons\Database\Traits\Taggable;
 use NextDeveloper\Commons\Database\Traits\RunAsAdministrator;
+use NextDeveloper\Commons\Database\Traits\HasObject;
 
 /**
  * AccountsPerspective model.
@@ -24,7 +25,7 @@ use NextDeveloper\Commons\Database\Traits\RunAsAdministrator;
  * @property array $tags
  * @property integer $common_domain_id
  * @property integer $common_language_id
- * @property $limits
+ * @property array $limits
  * @property boolean $is_suspended
  * @property boolean $is_auto_translate_enabled
  * @property $alternate
@@ -34,7 +35,7 @@ use NextDeveloper\Commons\Database\Traits\RunAsAdministrator;
  */
 class AccountsPerspective extends Model
 {
-    use Filterable, UuidId, CleanCache, Taggable, HasStates, RunAsAdministrator;
+    use Filterable, UuidId, CleanCache, Taggable, HasStates, RunAsAdministrator, HasObject;
     use SoftDeletes;
 
     public $timestamps = true;
@@ -85,7 +86,7 @@ class AccountsPerspective extends Model
     'tags' => \NextDeveloper\Commons\Database\Casts\TextArray::class,
     'common_domain_id' => 'integer',
     'common_language_id' => 'integer',
-    'limits' => 'array',
+    'limits' => \NextDeveloper\Commons\Database\Casts\TextArray::class,
     'is_suspended' => 'boolean',
     'is_auto_translate_enabled' => 'boolean',
     'alternate' => 'array',
@@ -153,6 +154,9 @@ class AccountsPerspective extends Model
     }
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+
+
 
 
 }

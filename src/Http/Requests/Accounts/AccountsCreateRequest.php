@@ -13,11 +13,11 @@ class AccountsCreateRequest extends AbstractFormRequest
     public function rules()
     {
         return [
-            'common_domain_id' => 'required|exists:common_domains,uuid|uuid',
-        'alternate' => '',
-        'is_auto_translate_enabled' => 'boolean',
-        'limits' => '',
+            'limits' => 'nullable',
         'is_suspended' => 'boolean',
+        'alternate' => '',
+        'common_domain_id' => 'required|exists:common_domains,uuid|uuid',
+        'is_auto_translate_enabled' => 'boolean',
         'common_language_id' => 'nullable|exists:common_languages,uuid|uuid',
         ];
     }

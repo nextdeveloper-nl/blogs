@@ -1589,5 +1589,65 @@ return [
         return NextDeveloper\Blogs\Database\Models\BlogPostsPerspective::findByRef($value);
 },
 
+'blogpost' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPost::findByRef($value);
+},
+
+'blogaccount' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogAccount::findByRef($value);
+},
+
+'blogpostslughistory' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPostSlugHistory::findByRef($value);
+},
+
+'blogaccountsperspective' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogAccountsPerspective::findByRef($value);
+},
+
+'blogpostsperspective' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPostsPerspective::findByRef($value);
+},
+
+'blogpost' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPost::findByRef($value);
+},
+
+'blogaccount' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogAccount::findByRef($value);
+},
+
+'blogpostslughistory' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPostSlugHistory::findByRef($value);
+},
+
+'blogaccountsperspective' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogAccountsPerspective::findByRef($value);
+},
+
+'blogpostsperspective' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPostsPerspective::findByRef($value);
+},
+
+'blogpost' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPost::findByRef($value);
+},
+
+'blogaccount' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogAccount::findByRef($value);
+},
+
+'blogpostslughistory' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPostSlugHistory::findByRef($value);
+},
+
+'blogaccountsperspective' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogAccountsPerspective::findByRef($value);
+},
+
+'blogpostsperspective' => function ($value) {
+        return NextDeveloper\Blogs\Database\Models\BlogPostsPerspective::findByRef($value);
+},
+
 // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 ];
