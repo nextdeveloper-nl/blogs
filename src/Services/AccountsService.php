@@ -41,4 +41,26 @@ class AccountsService extends AbstractAccountsService
 
         return $accounts;
     }
+
+    /**
+     * Suspends the Blogs account belonging to the given IAM account, if one
+     * exists. Blogs accounts are opt-in, so a customer without one is a
+     * no-op here, not an error.
+     */
+    public static function suspendWithIamAccount(\NextDeveloper\IAM\Database\Models\Accounts $account): ?Accounts
+    {
+        $blogAccount = Accounts::withoutGlobalScope(AuthorizationScope::class)
+            ->where('iam_account_id', $account->id)
+            ->first();
+
+        if (!$blogAccount) {
+            return null;
+        }
+
+        $blogAccount->update([
+            'is_suspended' => true,
+        ]);
+
+        return $blogAccount->fresh();
+    }
 }
