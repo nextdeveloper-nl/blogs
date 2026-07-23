@@ -59,7 +59,7 @@ class AbstractPostsTransformer extends AbstractTransformer
                                                             $commonCategoryId = \NextDeveloper\Commons\Database\Models\Categories::where('id', $model->common_category_id)->first();
                                                             $commonDomainId = \NextDeveloper\Commons\Database\Models\Domains::where('id', $model->common_domain_id)->first();
                                                             $blogAccountId = \NextDeveloper\Blogs\Database\Models\Accounts::where('id', $model->blog_account_id)->first();
-                        
+
         return $this->buildPayload(
             [
             'id'  =>  $model->uuid,

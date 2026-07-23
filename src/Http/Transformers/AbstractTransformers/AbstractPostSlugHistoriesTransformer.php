@@ -57,7 +57,7 @@ class AbstractPostSlugHistoriesTransformer extends AbstractTransformer
                                                 $blogPostId = \NextDeveloper\Blogs\Database\Models\Posts::where('id', $model->blog_post_id)->first();
                                                             $iamAccountId = \NextDeveloper\IAM\Database\Models\Accounts::where('id', $model->iam_account_id)->first();
                                                             $iamUserId = \NextDeveloper\IAM\Database\Models\Users::where('id', $model->iam_user_id)->first();
-                        
+
         return $this->buildPayload(
             [
             'id'  =>  $model->uuid,

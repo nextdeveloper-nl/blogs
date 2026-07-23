@@ -25,7 +25,7 @@ use NextDeveloper\Commons\Exceptions\NotAllowedException;
  */
 class AbstractPostsPerspectiveService
 {
-    public static function get(PostsPerspectiveQueryFilter $filter = null, array $params = []) : Collection|LengthAwarePaginator
+    public static function get(?PostsPerspectiveQueryFilter $filter = null, array $params = []) : Collection|LengthAwarePaginator
     {
         $enablePaginate = array_key_exists('paginate', $params);
 
@@ -278,7 +278,7 @@ class AbstractPostsPerspectiveService
                 $data['common_category_id']
             );
         }
-    
+
         Events::fire('updating:NextDeveloper\Blogs\PostsPerspective', $model);
 
         try {

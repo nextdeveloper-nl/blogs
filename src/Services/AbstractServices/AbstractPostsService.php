@@ -25,7 +25,7 @@ use NextDeveloper\Commons\Exceptions\NotAllowedException;
  */
 class AbstractPostsService
 {
-    public static function get(PostsQueryFilter $filter = null, array $params = []) : Collection|LengthAwarePaginator
+    public static function get(?PostsQueryFilter $filter = null, array $params = []) : Collection|LengthAwarePaginator
     {
         $enablePaginate = array_key_exists('paginate', $params);
 
@@ -212,7 +212,7 @@ class AbstractPostsService
                 $data['blog_account_id']
             );
         }
-                        
+
         try {
             $model = Posts::create($data);
         } catch(\Exception $e) {
@@ -290,7 +290,7 @@ class AbstractPostsService
                 $data['blog_account_id']
             );
         }
-    
+
         Events::fire('updating:NextDeveloper\Blogs\Posts', $model);
 
         try {

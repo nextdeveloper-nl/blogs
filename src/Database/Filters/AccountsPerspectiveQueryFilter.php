@@ -37,13 +37,13 @@ class AccountsPerspectiveQueryFilter extends AbstractQueryFilter
      * @var Builder
      */
     protected $builder;
-    
+
     public function name($value)
     {
         return $this->builder->where('name', 'ilike', '%' . $value . '%');
     }
 
-    
+
     public function isActive($value)
     {
         return $this->builder->where('is_active', $value);
@@ -54,7 +54,7 @@ class AccountsPerspectiveQueryFilter extends AbstractQueryFilter
     {
         return $this->isActive($value);
     }
-     
+
     public function isSuspended($value)
     {
         return $this->builder->where('is_suspended', $value);
@@ -65,7 +65,7 @@ class AccountsPerspectiveQueryFilter extends AbstractQueryFilter
     {
         return $this->isSuspended($value);
     }
-     
+
     public function isAutoTranslateEnabled($value)
     {
         return $this->builder->where('is_auto_translate_enabled', $value);
@@ -76,7 +76,7 @@ class AccountsPerspectiveQueryFilter extends AbstractQueryFilter
     {
         return $this->isAutoTranslateEnabled($value);
     }
-     
+
     public function createdAtStart($date)
     {
         return $this->builder->where('created_at', '>=', $date);
@@ -157,7 +157,7 @@ class AccountsPerspectiveQueryFilter extends AbstractQueryFilter
     {
         return $this->commonDomain($value);
     }
-    
+
     public function commonLanguageId($value)
     {
             $commonLanguage = \NextDeveloper\Commons\Database\Models\Languages::where('uuid', $value)->first();
@@ -172,7 +172,7 @@ class AccountsPerspectiveQueryFilter extends AbstractQueryFilter
     {
         return $this->commonLanguage($value);
     }
-    
+
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
 
