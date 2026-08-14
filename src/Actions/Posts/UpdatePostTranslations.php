@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Blogs\Helpers\TranslatablePostHelper;
+use NextDeveloper\Blogs\Services\PostsService;
 use NextDeveloper\Commons\Actions\AbstractAction;
 use NextDeveloper\Commons\Exceptions\NotAllowedException;
 use NextDeveloper\IAM\Helpers\UserHelper;
@@ -66,7 +67,7 @@ class UpdatePostTranslations extends AbstractAction
 
             $this->updateAlternates($validAlternates);
 
-            $this->syncAlternatesColumn($validAlternates);
+            PostsService::syncAlternatesForGroup($this->model->id);
 
             $this->setProgress(100, 'Post alternates updated successfully.');
             $this->setFinished('Post alternates updated successfully.');
@@ -219,46 +220,6 @@ class UpdatePostTranslations extends AbstractAction
 
             $translatedPost->updateQuietly($payload);
         });
-    }
-
-    /**
-     * Normalizes the alternates column on the source post so each entry
-     * reflects the latest slug/title of the translated post.
-     *
-     * @param  array<int, array<string, mixed>>  $alternates
-     */
-    private function syncAlternatesColumn(array $alternates): void
-    {
-        $ids = array_column($alternates, 'id');
-
-        if (empty($ids)) {
-            return;
-        }
-
-        $fresh = Posts::withoutGlobalScopes()
-            ->whereIn('id', $ids)
-            ->get()
-            ->keyBy('id');
-
-        $updated = [];
-
-        foreach ($alternates as $alternate) {
-            $post = $fresh->get($alternate['id']);
-
-            if (!$post) {
-                continue;
-            }
-
-            $updated[] = [
-                'id' => $post->id,
-                'locale' => strtolower(trim($alternate['locale'])),
-                'title' => $post->title,
-                'slug' => $post->slug,
-            ];
-        }
-
-        $this->model->alternates = $this->cleanAlternates($updated);
-        $this->model->saveQuietly();
     }
 
     /**

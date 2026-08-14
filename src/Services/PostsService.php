@@ -164,4 +164,42 @@ class PostsService extends AbstractPostsService
 
         return [];
     }
+
+    /**
+     * Rebuilds the alternates column for every post in a translation group (the
+     * root post plus every post whose alternate_of points at it) so each member
+     * lists every other member, not just the root. Historically only the root
+     * post's alternates column was ever written, leaving translated posts with
+     * an empty alternates field; this is used both to fix that going forward
+     * (TranslatePost, UpdatePostTranslations) and to backfill existing rows.
+     */
+    public static function syncAlternatesForGroup(int $rootPostId): void
+    {
+        $group = Posts::withoutGlobalScope(AuthorizationScope::class)
+            ->where('id', $rootPostId)
+            ->orWhere('alternate_of', $rootPostId)
+            ->get();
+
+        if ($group->count() < 2) {
+            return;
+        }
+
+        $entries = $group->map(fn (Posts $post) => [
+            'id' => $post->id,
+            'locale' => strtolower(trim((string) $post->locale)),
+            'title' => $post->title,
+            'slug' => $post->slug,
+        ]);
+
+        foreach ($group as $post) {
+            $ownAlternates = $entries
+                ->reject(fn (array $entry) => $entry['id'] === $post->id)
+                ->values()
+                ->toArray();
+
+            if ($post->alternates !== $ownAlternates) {
+                $post->updateQuietly(['alternates' => $ownAlternates]);
+            }
+        }
+    }
 }
