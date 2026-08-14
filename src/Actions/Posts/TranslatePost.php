@@ -9,6 +9,7 @@ use NextDeveloper\Blogs\Database\Models\Accounts;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Blogs\Helpers\TranslatablePostHelper;
 use NextDeveloper\Blogs\Services\AccountsService;
+use NextDeveloper\Blogs\Services\PostsService;
 use NextDeveloper\Commons\Actions\AbstractAction;
 use NextDeveloper\Commons\Database\Models\Languages;
 use NextDeveloper\Commons\Exceptions\NotAllowedException;
@@ -217,7 +218,7 @@ class TranslatePost extends AbstractAction
                 throw new Exception("Failed to create translated post for locale: {$locale}");
             }
 
-            $this->linkAlternate($lockedPost, $translatedPost, $locale);
+            PostsService::syncAlternatesForGroup($lockedPost->id);
         });
     }
 
@@ -236,21 +237,6 @@ class TranslatePost extends AbstractAction
                     ->orWhere('blog_account_id', $destinationAccount->id);
             })
             ->exists();
-    }
-
-    private function linkAlternate(Posts $originalPost, Posts $translatedPost, string $locale): void
-    {
-        $alternates = $this->normalizeAlternates($originalPost->alternates);
-
-        $alternates[] = [
-            'id' => $translatedPost->id,
-            'locale' => $locale,
-            'title' => $translatedPost->title,
-            'slug' => $translatedPost->slug,
-        ];
-
-        $originalPost->alternates = $this->cleanAlternates($alternates);
-        $originalPost->saveQuietly();
     }
 
     /**
