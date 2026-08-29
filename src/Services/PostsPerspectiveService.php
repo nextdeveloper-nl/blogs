@@ -19,7 +19,7 @@ class PostsPerspectiveService extends AbstractPostsPerspectiveService
 
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
-    public static function get(PostsPerspectiveQueryFilter $filter = null, array $params = []): \Illuminate\Database\Eloquent\Collection|\Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public static function get(?PostsPerspectiveQueryFilter $filter = null, array $params = []): \Illuminate\Database\Eloquent\Collection|\Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $list = parent::get($filter, $params);
 

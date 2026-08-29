@@ -37,25 +37,25 @@ class PostsQueryFilter extends AbstractQueryFilter
      * @var Builder
      */
     protected $builder;
-    
+
     public function slug($value)
     {
         return $this->builder->where('slug', 'ilike', '%' . $value . '%');
     }
 
-        
+
     public function title($value)
     {
         return $this->builder->where('title', 'ilike', '%' . $value . '%');
     }
 
-        
+
     public function body($value)
     {
         return $this->builder->where('body', 'ilike', '%' . $value . '%');
     }
 
-        
+
     public function headerImage($value)
     {
         return $this->builder->where('header_image', 'ilike', '%' . $value . '%');
@@ -66,7 +66,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->headerImage($value);
     }
-        
+
     public function metaTitle($value)
     {
         return $this->builder->where('meta_title', 'ilike', '%' . $value . '%');
@@ -77,7 +77,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->metaTitle($value);
     }
-        
+
     public function metaDescription($value)
     {
         return $this->builder->where('meta_description', 'ilike', '%' . $value . '%');
@@ -88,7 +88,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->metaDescription($value);
     }
-        
+
     public function metaKeywords($value)
     {
         return $this->builder->where('meta_keywords', 'ilike', '%' . $value . '%');
@@ -99,19 +99,19 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->metaKeywords($value);
     }
-        
+
     public function abstract($value)
     {
         return $this->builder->where('abstract', 'ilike', '%' . $value . '%');
     }
 
-        
+
     public function locale($value)
     {
         return $this->builder->where('locale', 'ilike', '%' . $value . '%');
     }
 
-    
+
     public function replyCount($value)
     {
         $operator = substr($value, 0, 1);
@@ -130,7 +130,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->replyCount($value);
     }
-    
+
     public function readCount($value)
     {
         $operator = substr($value, 0, 1);
@@ -149,7 +149,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->readCount($value);
     }
-    
+
     public function bonusPoints($value)
     {
         $operator = substr($value, 0, 1);
@@ -168,7 +168,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->bonusPoints($value);
     }
-    
+
     public function alternateOf($value)
     {
         $operator = substr($value, 0, 1);
@@ -187,7 +187,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->alternateOf($value);
     }
-    
+
     public function isActive($value)
     {
         return $this->builder->where('is_active', $value);
@@ -198,7 +198,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->isActive($value);
     }
-     
+
     public function isLocked($value)
     {
         return $this->builder->where('is_locked', $value);
@@ -209,7 +209,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->isLocked($value);
     }
-     
+
     public function isPinned($value)
     {
         return $this->builder->where('is_pinned', $value);
@@ -220,7 +220,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->isPinned($value);
     }
-     
+
     public function isDraft($value)
     {
         return $this->builder->where('is_draft', $value);
@@ -231,7 +231,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->isDraft($value);
     }
-     
+
     public function isMarkdown($value)
     {
         return $this->builder->where('is_markdown', $value);
@@ -242,7 +242,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->isMarkdown($value);
     }
-     
+
     public function createdAtStart($date)
     {
         return $this->builder->where('created_at', '>=', $date);
@@ -318,7 +318,7 @@ class PostsQueryFilter extends AbstractQueryFilter
         }
     }
 
-    
+
     public function iamUserId($value)
     {
             $iamUser = \NextDeveloper\IAM\Database\Models\Users::where('uuid', $value)->first();
@@ -328,7 +328,7 @@ class PostsQueryFilter extends AbstractQueryFilter
         }
     }
 
-    
+
     public function commonCategoryId($value)
     {
             $commonCategory = \NextDeveloper\Commons\Database\Models\Categories::where('uuid', $value)->first();
@@ -343,7 +343,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->commonCategory($value);
     }
-    
+
     public function commonDomainId($value)
     {
             $commonDomain = \NextDeveloper\Commons\Database\Models\Domains::where('uuid', $value)->first();
@@ -358,7 +358,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->commonDomain($value);
     }
-    
+
     public function blogAccountId($value)
     {
             $blogAccount = \NextDeveloper\Blogs\Database\Models\Accounts::where('uuid', $value)->first();
@@ -373,7 +373,7 @@ class PostsQueryFilter extends AbstractQueryFilter
     {
         return $this->blogAccount($value);
     }
-    
+
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
 
