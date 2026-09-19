@@ -93,6 +93,9 @@ class Posts extends Model
             'locale',
             'blog_account_id',
             'faqs',
+            'blog_content_request_id',
+            'source_type',
+            'source_partner_name',
     ];
 
     /**
@@ -143,6 +146,9 @@ class Posts extends Model
     'locale' => 'string',
     'blog_account_id' => 'integer',
     'faqs' => 'array',
+    'blog_content_request_id' => 'integer',
+    'source_type' => 'string',
+    'source_partner_name' => 'string',
     ];
 
     /**

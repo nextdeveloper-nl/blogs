@@ -89,6 +89,8 @@ class BlogSalesPerson extends AbstractRole implements IAuthorizationRole
             'blog_posts_perspective:read',
             'blog_categories:read',
             'blog_tags:read',
+            'blog_content_requests:read',
+            'blog_content_request_items:read',
         ];
     }
 
