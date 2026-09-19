@@ -107,7 +107,51 @@ Route::prefix('blogs')->group(
             }
         );
 
+        Route::prefix('content-requests')->group(
+            function () {
+                Route::get('/', 'ContentRequests\ContentRequestsController@index');
+                Route::get('/actions', 'ContentRequests\ContentRequestsController@getActions');
+
+                Route::get('{blog_content_requests}/tags ', 'ContentRequests\ContentRequestsController@tags');
+                Route::post('{blog_content_requests}/tags ', 'ContentRequests\ContentRequestsController@saveTags');
+                Route::get('{blog_content_requests}/addresses ', 'ContentRequests\ContentRequestsController@addresses');
+                Route::post('{blog_content_requests}/addresses ', 'ContentRequests\ContentRequestsController@saveAddresses');
+
+                Route::get('/{blog_content_requests}/{subObjects}', 'ContentRequests\ContentRequestsController@relatedObjects');
+                Route::get('/{blog_content_requests}', 'ContentRequests\ContentRequestsController@show');
+
+                Route::post('/', 'ContentRequests\ContentRequestsController@store');
+                Route::post('/{blog_content_requests}/do/{action}', 'ContentRequests\ContentRequestsController@doAction');
+
+                Route::patch('/{blog_content_requests}', 'ContentRequests\ContentRequestsController@update');
+                Route::delete('/{blog_content_requests}', 'ContentRequests\ContentRequestsController@destroy');
+            }
+        );
+
+        Route::prefix('content-request-items')->group(
+            function () {
+                Route::get('/', 'ContentRequestItems\ContentRequestItemsController@index');
+                Route::get('/actions', 'ContentRequestItems\ContentRequestItemsController@getActions');
+
+                Route::get('{blog_content_request_items}/tags ', 'ContentRequestItems\ContentRequestItemsController@tags');
+                Route::post('{blog_content_request_items}/tags ', 'ContentRequestItems\ContentRequestItemsController@saveTags');
+                Route::get('{blog_content_request_items}/addresses ', 'ContentRequestItems\ContentRequestItemsController@addresses');
+                Route::post('{blog_content_request_items}/addresses ', 'ContentRequestItems\ContentRequestItemsController@saveAddresses');
+
+                Route::get('/{blog_content_request_items}/{subObjects}', 'ContentRequestItems\ContentRequestItemsController@relatedObjects');
+                Route::get('/{blog_content_request_items}', 'ContentRequestItems\ContentRequestItemsController@show');
+
+                Route::post('/', 'ContentRequestItems\ContentRequestItemsController@store');
+                Route::post('/{blog_content_request_items}/do/{action}', 'ContentRequestItems\ContentRequestItemsController@doAction');
+
+                Route::patch('/{blog_content_request_items}', 'ContentRequestItems\ContentRequestItemsController@update');
+                Route::delete('/{blog_content_request_items}', 'ContentRequestItems\ContentRequestItemsController@destroy');
+            }
+        );
+
         // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
+
+
 
 
 

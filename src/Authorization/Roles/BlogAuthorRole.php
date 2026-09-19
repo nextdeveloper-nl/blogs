@@ -56,6 +56,14 @@ class BlogAuthorRole extends AbstractRole implements IAuthorizationRole
             'blog_post_slug_histories:update',
             'blog_post_slug_histories:delete',
 
+            'blog_content_requests:read',
+            'blog_content_requests:create',
+            'blog_content_requests:update',
+
+            'blog_content_request_items:read',
+            'blog_content_request_items:create',
+            'blog_content_request_items:update',
+
             'blog_posts_perspective:read',
             'blog_accounts_perspective:read',
         ];
