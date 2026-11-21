@@ -25,7 +25,7 @@ use NextDeveloper\Commons\Exceptions\NotAllowedException;
  */
 class AbstractPostSlugHistoriesService
 {
-    public static function get(PostSlugHistoriesQueryFilter $filter = null, array $params = []) : Collection|LengthAwarePaginator
+    public static function get(?PostSlugHistoriesQueryFilter $filter = null, array $params = []) : Collection|LengthAwarePaginator
     {
         $enablePaginate = array_key_exists('paginate', $params);
 
