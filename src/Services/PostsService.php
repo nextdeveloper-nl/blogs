@@ -6,12 +6,14 @@ use Google\Service\Blogger\Post;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use NextDeveloper\Blogs\Database\Filters\PostsQueryFilter;
 use NextDeveloper\Blogs\Database\Models\Accounts;
 use NextDeveloper\Blogs\Database\Models\Posts;
 use NextDeveloper\Blogs\Database\Models\PostSlugHistories;
 use NextDeveloper\Blogs\Database\Models\PostsPerspective;
 use NextDeveloper\Blogs\Services\AbstractServices\AbstractPostsService;
+use NextDeveloper\Commons\Database\Models\Categories;
 use NextDeveloper\Commons\Database\Models\Domains;
 use NextDeveloper\IAM\Database\Scopes\AuthorizationScope;
 use NextDeveloper\IAM\Helpers\UserHelper;
@@ -25,8 +27,44 @@ class PostsService extends AbstractPostsService
 {
     // EDIT AFTER HERE - WARNING: ABOVE THIS LINE MAY BE REGENERATED AND YOU MAY LOSE CODE
 
+    /**
+     * Turns a common_category_id uuid into the internal id, accepting only a category the caller may use.
+     *
+     * Done here, not in the abstract service: that one looks the category up through the AuthorizationScope, and on
+     * a POST/PATCH the Commons role scopes common_categories to the caller's own account, so a platform (or public)
+     * category came back null and the insert failed on the NOT NULL column (HTTP 500). Request validation already
+     * proved the uuid exists; here we accept a system category (no owner), a public one, or one of the caller's own
+     * account, and answer 422 naming the field otherwise.
+     */
+    private static function resolveCategory(array $data): array
+    {
+        if (! isset($data['common_category_id']) || ! is_string($data['common_category_id'])) {
+            return $data;
+        }
+
+        $category = Categories::withoutGlobalScope(AuthorizationScope::class)
+            ->where('uuid', $data['common_category_id'])
+            ->first();
+
+        $usable = $category
+            && ($category->iam_account_id === null
+                || $category->is_public
+                || (int) $category->iam_account_id === (int) UserHelper::currentAccount()->id);
+
+        if (! $usable) {
+            throw ValidationException::withMessages(['common_category_id' => 'The selected common category id is invalid.']);
+        }
+
+        //  The abstract service passes an integer id through unchanged.
+        $data['common_category_id'] = $category->id;
+
+        return $data;
+    }
+
     public static function update($id, array $data)
     {
+        $data = self::resolveCategory($data);
+
         $post = Posts::withoutGlobalScope(AuthorizationScope::class)
             ->where('uuid', $id)
             ->first();
@@ -79,11 +117,22 @@ class PostsService extends AbstractPostsService
             ->where('uuid', $data['common_domain_id'])
             ->first();
 
+        //  An unknown domain used to end in a null dereference (HTTP 500); answer 422 naming the field instead.
+        if (! $domain) {
+            throw ValidationException::withMessages(['common_domain_id' => 'The selected common domain id is invalid.']);
+        }
+
         $account = Accounts::withoutGlobalScope(AuthorizationScope::class)
             ->where('common_domain_id', $domain->id)
             ->first();
 
+        if (! $account) {
+            throw ValidationException::withMessages(['common_domain_id' => 'There is no blog account for this domain.']);
+        }
+
         $data['blog_account_id'] = $account->id;
+
+        $data = self::resolveCategory($data);
 
         return parent::create($data);
     }
